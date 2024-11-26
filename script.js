@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('games.json 파일을 성공적으로 로드했습니다.');
             return response.json();
         })
-        .then(nameMapping => {
+        .then(async nameMapping => {
             // Create list items for each game
             const gameList = document.getElementById('game-list');
             for (const [koreanName, englishName] of Object.entries(nameMapping)) {
@@ -26,12 +26,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="best-players">Loading...</td>
                     <td class="recommended-players">Loading...</td>
                     <td class="players">Loading...</td>
+                    <td class="playtime">Loading...</td>
                 `;
                 gameList.appendChild(tr);
             }
 
             const links = document.querySelectorAll('.bgg-link');
-            links.forEach(async link => {
+            const promises = Array.from(links).map(async link => {
                 const koreanName = link.textContent.trim();
                 const englishName = link.getAttribute('englishName');
                 const bggId = link.getAttribute('bggId');
@@ -52,7 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
+            await Promise.all(promises);
             console.log('모든 게임 데이터를 성공적으로 로드했습니다.');
+
             // 초기 상태는 난이도 기준 오름차순 정렬
             sortGamesByScore('desc');
             sortGamesByWeight('asc');
@@ -183,6 +186,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     playerCountInput.value = '';
+
+    // Add event listeners for new sort buttons
+    const nameSortButton = document.getElementById('name-sort-button');
+    const playtimeSortButton = document.getElementById('playtime-sort-button');
+
+    nameSortButton.addEventListener('click', () => {
+        console.log('게임 이름 기준 정렬 버튼 클릭됨.');
+        sortGamesByName();
+    });
+
+    playtimeSortButton.addEventListener('click', () => {
+        console.log('플레이 시간 기준 정렬 버튼 클릭됨.');
+        sortGamesByPlaytime();
+    });
 });
 
 function openPostWindow(url, data) {
@@ -207,7 +224,7 @@ function openPostWindow(url, data) {
     document.body.removeChild(form);
 }
 
-function fetchGameData(koreanName, englishName, linkElement) {
+async function fetchGameData(koreanName, englishName, linkElement) {
     const apiUrl = `https://www.boardgamegeek.com/xmlapi2/search?query=${encodeURIComponent(englishName)}&type=boardgame`;
     const cacheKey = `search_${englishName.toLowerCase()}`;
 
@@ -273,7 +290,7 @@ function fetchGameData(koreanName, englishName, linkElement) {
         });
 }
 
-function fetchGameDetails(gameId, linkElement) {
+async function fetchGameDetails(gameId, linkElement) {
     const detailsUrl = `https://www.boardgamegeek.com/xmlapi2/thing?id=${gameId}&stats=1`;
     const cacheKey = `game_details_${gameId}`;
 
@@ -285,11 +302,13 @@ function fetchGameDetails(gameId, linkElement) {
             const averageweight = data.querySelector('averageweight').getAttribute('value');
             const minPlayers = data.querySelector('minplayers').getAttribute('value');
             const maxPlayers = data.querySelector('maxplayers').getAttribute('value');
-            const minAge = data.querySelector('minage').getAttribute('value');
+            const minPlaytime = data.querySelector('minplaytime').getAttribute('value');
+            const maxPlaytime = data.querySelector('maxplaytime').getAttribute('value');
             const description = data.querySelector('description').textContent.trim();
 
             const rating = average ? parseFloat(average).toFixed(2) : 'N/A';
             const weight = averageweight ? parseFloat(averageweight).toFixed(2) : 'N/A';
+            const playtime = minPlaytime && maxPlaytime ? minPlaytime === maxPlaytime ? `${minPlaytime}분` : `${minPlaytime} - ${maxPlaytime}분` : 'N/A';
 
             // Extract suggested_numplayers
             const pollSummary = data.querySelector('poll-summary[name="suggested_numplayers"]');
@@ -323,6 +342,7 @@ function fetchGameDetails(gameId, linkElement) {
             linkElement.parentElement.parentElement.querySelector('.score').textContent = rating;
             linkElement.parentElement.parentElement.querySelector('.weight').textContent = weight;
             linkElement.parentElement.parentElement.querySelector('.players').textContent = `${minPlayers} - ${maxPlayers}`;
+            linkElement.parentElement.parentElement.querySelector('.playtime').textContent = playtime;
 
             // Store bestWith and recommendedWith as data attributes on the <li>
             const listItem = linkElement.parentElement.parentElement;
@@ -413,14 +433,22 @@ function sortGames(sortButton, selector, forceTo = null) {
     const items = Array.from(gameLists.querySelectorAll('tr'));
 
     items.sort((a, b) => {
-        const scoreA = parseFloat(a.querySelector(selector).textContent) || 0;
-        const scoreB = parseFloat(b.querySelector(selector).textContent) || 0;
-        return order === 'desc' ? scoreB - scoreA : scoreA - scoreB;
+        const textA = a.querySelector(selector).textContent.trim();
+        const textB = b.querySelector(selector).textContent.trim();
+
+        if (selector === '.playtime') {
+            const timeA = parsePlaytime(textA);
+            const timeB = parsePlaytime(textB);
+            return order === 'desc' ? timeB - timeA : timeA - timeB;
+        } else {
+            return order === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
+        }
     });
 
-    // 정렬된 항목 다시 추가
+    // Re-append sorted items
     items.forEach(item => gameLists.appendChild(item));
 
+    // Update button styles and text
     const recentlySortedButtons = document.getElementsByClassName('recently-sorted');
     for (const recentlySortedButton of recentlySortedButtons) {
         recentlySortedButton.classList.remove('recently-sorted');
@@ -436,12 +464,11 @@ function sortGames(sortButton, selector, forceTo = null) {
         sortButton.textContent = `${b} ▶︎ ${a}`;
     }
 
-    // add animation
+    // Add animation
     gameLists.classList.add('sorting');
     setTimeout(() => {
         gameLists.classList.remove('sorting');
     }, 500);
-    return;
 }
 
 function sortGamesByScore(forceTo = null) {
@@ -452,6 +479,16 @@ function sortGamesByScore(forceTo = null) {
 function sortGamesByWeight(forceTo = null) {
     const weightSortButton = document.getElementById('weight-sort-button');
     sortGames(weightSortButton, '.weight', forceTo);
+}
+
+function sortGamesByName(forceTo = null) {
+    const nameSortButton = document.getElementById('name-sort-button');
+    sortGames(nameSortButton, 'td:first-child', forceTo);
+}
+
+function sortGamesByPlaytime(forceTo = null) {
+    const playtimeSortButton = document.getElementById('playtime-sort-button');
+    sortGames(playtimeSortButton, '.playtime', forceTo);
 }
 
 /**
@@ -492,4 +529,9 @@ async function cachedFetch(url, options = {}, cacheKey = null) {
                 return response;
             });
         });
+}
+
+function parsePlaytime(playtimeText) {
+    const [min, max] = playtimeText.split(' - ').map(time => parseInt(time, 10));
+    return max ? (min + max) / 2 : min;
 }
