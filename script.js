@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     // 상세 게임 데이터 가져오기
                     await fetchGameDetails(bggId, link);
+                    return;
                 }
                 
                 if (englishName) {
@@ -510,28 +511,134 @@ async function cachedFetch(url, options = {}, cacheKey = null) {
         return Promise.resolve(new Response(new Blob([cached])));
     }
 
-    // random delay to prevent rate limit. return promise to wait for delay.
-    const delay = Math.random() * 1000;
-    await new Promise(resolve => setTimeout(resolve, delay));
+    try {
+        // 레이트 리미팅된 fetch 사용
+        const response = await rateLimitedFetch(url, options);
 
-    // 네트워크 요청 수행
-    return fetch(url, options)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP 에러! 상태: ${response.status}`);
-            }
-            return response.clone().text().then(data => {
-                try {
-                    localStorage.setItem(key, data);
-                } catch (e) {
-                    console.warn('로컬 스토리지 저장 실패:', e);
-                }
-                return response;
-            });
-        });
+        if (!response.ok) {
+            throw new Error(`HTTP 에러! 상태: ${response.status}`);
+        }
+
+        const data = await response.clone().text();
+
+        try {
+            localStorage.setItem(key, data);
+        } catch (e) {
+            console.warn('로컬 스토리지 저장 실패:', e);
+        }
+
+        return response;
+    } catch (error) {
+        console.error('레이트 리미팅된 fetch 에러:', error);
+        throw error;
+    }
 }
 
 function parsePlaytime(playtimeText) {
     const [min, max] = playtimeText.split(' - ').map(time => parseInt(time, 10));
     return max ? (min + max) / 2 : min;
+}
+
+// Global request queue
+const requestQueue = [];
+let isProcessing = false;
+
+// Function to process the request queue
+function processQueue() {
+    if (isProcessing || requestQueue.length === 0) return;
+
+    console.log('processQueue', requestQueue.length);
+
+    isProcessing = true;
+    const { url, options, resolve, reject } = requestQueue.shift();
+
+    fetch(url, options)
+        .then(response => {
+            isProcessing = false;
+            resolve(response);
+        })
+        .catch(error => {
+            isProcessing = false;
+            reject(error);
+        });
+}
+
+// RateLimiter 클래스 정의
+class RateLimiter {
+    constructor(interval, maxRetries = 3, retryDelay = 1000) {
+        this.queue = [];
+        this.isProcessing = false;
+        this.interval = interval; // 요청 간 간격 (밀리초)
+        this.maxRetries = maxRetries; // 최대 재시도 횟수
+        this.retryDelay = retryDelay; // 재시도 대기 시간 (밀리초)
+    }
+
+    enqueue(request, retries = 0) {
+        if (this.isWaiting && retries > 0) {
+            this.isWaiting = false;
+        }
+
+        return new Promise((resolve, reject) => {
+            this.queue.push({ request, resolve, reject, retries });
+            this.processQueue();
+        });
+    }
+
+    async processQueue() {
+        if (this.isWaiting || this.isProcessing || this.queue.length === 0) return;
+
+        this.isProcessing = true;
+        const { request, resolve, reject, retries } = this.queue.shift();
+
+        try {
+            const response = await request();
+            if (!response.ok) {
+                if (retries < this.maxRetries) {
+                    console.warn(`요청 실패: ${response.status}. 재시도 ${retries + 1}/${this.maxRetries}...`);
+                    setTimeout(() => {
+                        this.enqueue(request, retries + 1).then(resolve).catch(reject);
+                    }, this.retryDelay);
+                } else {
+                    console.error(`요청 실패: ${response.status}. 최대 재시도 횟수 초과.`);
+                    reject(new Error(`HTTP 에러! 상태: ${response.status}`));
+                }
+            } else {
+                this.retryDelay *= 0.9;
+                resolve(response);
+            }
+        } catch (error) {
+            // CORS 오류 등 네트워크 오류 처리
+            if (retries < this.maxRetries) {
+                console.warn(`요청 에러: ${error.message}. 재시도 ${retries + 1}/${this.maxRetries}...`);
+                setTimeout(() => {
+                    this.enqueue(request, retries + 1).then(resolve).catch(reject);
+                }, this.retryDelay);
+                this.retryDelay *= 3.0;
+                this.isWaiting = true;
+            } else {
+                console.error(`요청 에러: ${error.message}. 최대 재시도 횟수 초과.`);
+                reject(error);
+            }
+        }
+
+        this.isProcessing = false;
+
+        // 지정된 간격 후에 다음 요청 처리
+        setTimeout(() => {
+            this.processQueue();
+        }, this.interval);
+    }
+}
+
+// 전역 RateLimiter 인스턴스 (300ms 간격, 최대 3회 재시도, 2000ms 재시도 대기)
+const rateLimiter = new RateLimiter(300, 3, 2000);
+
+/**
+ * 레이트 리미팅된 fetch 함수
+ * @param {string} url - 요청할 URL
+ * @param {object} options - fetch 옵션
+ * @returns {Promise<Response>} - fetch 응답
+ */
+async function rateLimitedFetch(url, options = {}) {
+    return rateLimiter.enqueue(() => fetch(url, options));
 }
