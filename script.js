@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('games.json 로드 에러:', error);
         });
 
+    // 기존 정렬 버튼 이벤트 리스너
     const scoreSortButton = document.getElementById('score-sort-button');
     const weightSortButton = document.getElementById('weight-sort-button');
     scoreSortButton.addEventListener('click', () => {
@@ -71,6 +72,67 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('난이도 기준 정렬 버튼 클릭됨.');
         sortGamesByWeight();
     });
+
+    // 필터 기능 업데이트
+    const resetButton = document.getElementById('reset-button');
+    const playerCountInput = document.getElementById('player-count');
+    const gameList = document.getElementById('game-list');
+    const filterStatus = document.getElementById('filter-status'); // 필터 상태 메시지 요소
+
+    // 실시간 필터 적용: input 이벤트 리스너 추가
+    playerCountInput.addEventListener('input', () => {
+        const playerCount = parseInt(playerCountInput.value, 10);
+        const games = gameList.querySelectorAll('li');
+        let visibleCount = 0;
+        const totalGames = games.length;
+
+        // 숫자가 아닌 입력 못하게
+        if (playerCount !== parseInt(playerCountInput.value, 10)) {
+            playerCountInput.value = playerCount;
+        }
+
+        if (isNaN(playerCount) || playerCount < 1) {
+            // 유효하지 않은 입력: 모든 게임 표시하고 필터 상태 메시지 초기화
+            games.forEach(game => {
+                game.style.display = '';
+            });
+            filterStatus.textContent = '';
+            filterStatus.style.display = 'none';
+            return;
+        }
+
+        games.forEach(game => {
+            const playersText = game.querySelector('.players').textContent;
+            const [gameMin, gameMax] = playersText.split(' - ').map(num => parseInt(num, 10));
+
+            // 조건: 입력한 플레이어 수가 게임의 플레이어 범위 내에 있는지 확인
+            const isVisible = playerCount >= gameMin && playerCount <= gameMax;
+
+            game.style.display = isVisible ? '' : 'none';
+            if (isVisible) visibleCount++;
+        });
+
+        // 필터 상태 메시지 업데이트
+        filterStatus.textContent = `플레이어 수 ${playerCount}명에 맞는 게임 ${visibleCount}/${totalGames}개가 표시됩니다.`;
+        filterStatus.style.display = 'block';
+    });
+
+    resetButton.addEventListener('click', () => {
+        // 필터 입력 초기화
+        playerCountInput.value = '';
+        
+        // 모든 게임 표시
+        const games = gameList.querySelectorAll('li');
+        games.forEach(game => {
+            game.style.display = '';
+        });
+
+        // 필터 상태 메시지 초기화
+        filterStatus.textContent = '';
+        filterStatus.style.display = 'none';
+    });
+
+    // 나머지 기존 함수들 (fetchGameData, fetchGameDetails, getColor, sortGamesByScore, sortGamesByWeight 등)은 그대로 유지됩니다.
 });
 
 function openPostWindow(url, data) {
