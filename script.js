@@ -31,8 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const links = document.querySelectorAll('.bgg-link');
-            const promises = [];
-            links.forEach(link => {
+            links.forEach(async link => {
                 const koreanName = link.textContent.trim();
                 const englishName = link.getAttribute('englishName');
                 const bggId = link.getAttribute('bggId');
@@ -41,11 +40,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     link.href = gameUrl;
 
                     // 상세 게임 데이터 가져오기
-                    promises.push(fetchGameDetails(bggId, link));
+                    await fetchGameDetails(bggId, link);
                 }
                 
                 if (englishName) {
-                    promises.push(fetchGameData(koreanName, englishName, link));
+                    await fetchGameData(koreanName, englishName, link);
                 } else {
                     console.warn(`영어 이름을 찾을 수 없습니다: ${koreanName}`);
                     link.parentElement.querySelector('.score').textContent = 'N/A';
@@ -53,12 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            Promise.all(promises).then(() => {
-                console.log('모든 게임 데이터를 성공적으로 로드했습니다.');
-                // 초기 상태는 난이도 기준 오름차순 정렬
-                sortGamesByScore('desc');
-                sortGamesByWeight('asc');
-            });
+            console.log('모든 게임 데이터를 성공적으로 로드했습니다.');
+            // 초기 상태는 난이도 기준 오름차순 정렬
+            sortGamesByScore('desc');
+            sortGamesByWeight('asc');
         })
         .catch(error => {
             console.error('games.json 로드 에러:', error);
@@ -411,6 +408,8 @@ function sortGames(sortButton, selector, forceTo = null) {
     const switchOrder = previousOrder !== order;
     const gameLists = document.getElementById('game-list');
 
+    console.log('sortGames', sortButton, selector, order, previousOrder, switchOrder);
+
     const items = Array.from(gameLists.querySelectorAll('tr'));
 
     items.sort((a, b) => {
@@ -462,7 +461,7 @@ function sortGamesByWeight(forceTo = null) {
  * @param {string} cacheKey - 로컬 스토리지에 저장할 키
  * @returns {Promise<Response>} - fetch 응답
  */
-function cachedFetch(url, options = {}, cacheKey = null) {
+async function cachedFetch(url, options = {}, cacheKey = null) {
     // 캐시 키가 제공되지 않으면 URL을 키로 사용
     const key = cacheKey || url;
 
@@ -473,6 +472,10 @@ function cachedFetch(url, options = {}, cacheKey = null) {
         // 캐시된 데이터를 반환
         return Promise.resolve(new Response(new Blob([cached])));
     }
+
+    // random delay to prevent rate limit. return promise to wait for delay.
+    const delay = Math.random() * 1000;
+    await new Promise(resolve => setTimeout(resolve, delay));
 
     // 네트워크 요청 수행
     return fetch(url, options)

@@ -88,7 +88,7 @@ footer {
 }
 
 .worse-gradient {
-    background-image: linear-gradient(to right, #770000, #007700);
+    background-image: linear-gradient(to right, #007700, #770000);
 }
 
 .better-gradient.recently-sorted {
