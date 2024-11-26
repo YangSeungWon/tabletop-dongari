@@ -153,6 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update filter status message
         filterStatus.textContent = `플레이어 수 ${playerCount}명에 맞는 게임 ${visibleCount}/${totalGames}개가 표시됩니다.`;
         filterStatus.style.display = 'block';
+
+        // add animation
+        gameList.classList.add('sorting');
+        setTimeout(() => {
+            gameList.classList.remove('sorting');
+        }, 500);
     });
 
     resetButton.addEventListener('click', () => {
@@ -405,8 +411,6 @@ function sortGames(sortButton, selector, forceTo = null) {
     const switchOrder = previousOrder !== order;
     const gameLists = document.getElementById('game-list');
 
-    console.log('sortGames', sortButton, selector, order, previousOrder, switchOrder);
-
     const items = Array.from(gameLists.querySelectorAll('tr'));
 
     items.sort((a, b) => {
@@ -432,6 +436,12 @@ function sortGames(sortButton, selector, forceTo = null) {
         const [a, b] = sortButton.textContent.split('▶︎').map(s => s.trim());
         sortButton.textContent = `${b} ▶︎ ${a}`;
     }
+
+    // add animation
+    gameLists.classList.add('sorting');
+    setTimeout(() => {
+        gameLists.classList.remove('sorting');
+    }, 500);
     return;
 }
 
