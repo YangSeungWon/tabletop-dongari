@@ -82,17 +82,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 실시간 필터 적용: input 이벤트 리스너 추가
     playerCountInput.addEventListener('input', () => {
         const playerCount = parseInt(playerCountInput.value, 10);
-        const games = gameList.querySelectorAll('li');
+        const games = Array.from(gameList.querySelectorAll('li'));
         let visibleCount = 0;
         const totalGames = games.length;
 
-        // 숫자가 아닌 입력 못하게
+        // Prevent non-numeric input
         if (playerCount !== parseInt(playerCountInput.value, 10)) {
             playerCountInput.value = playerCount;
         }
 
         if (isNaN(playerCount) || playerCount < 1) {
-            // 유효하지 않은 입력: 모든 게임 표시하고 필터 상태 메시지 초기화
+            // Invalid input: Show all games and reset filter status
             games.forEach(game => {
                 game.style.display = '';
             });
@@ -101,18 +101,53 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        games.forEach(game => {
+        // Filter games based on player count
+        const filteredGames = games.filter(game => {
             const playersText = game.querySelector('.players').textContent;
             const [gameMin, gameMax] = playersText.split(' - ').map(num => parseInt(num, 10));
 
-            // 조건: 입력한 플레이어 수가 게임의 플레이어 범위 내에 있는지 확인
+            // Check if playerCount is within the game's player range
             const isVisible = playerCount >= gameMin && playerCount <= gameMax;
-
+            if (isVisible) {
+                visibleCount++;
+            }
             game.style.display = isVisible ? '' : 'none';
-            if (isVisible) visibleCount++;
+            return isVisible;
+        });
+        // Sort the filtered games based on priority
+        filteredGames.sort((a, b) => {
+            const aBest = checkPlayerCount(playerCount, a.getAttribute('data-bestwith'));
+            const bBest = checkPlayerCount(playerCount, b.getAttribute('data-bestwith'));
+
+            if (aBest && !bBest) return -1;
+            if (!aBest && bBest) return 1;
+
+            const aRecommended = checkPlayerCount(playerCount, a.getAttribute('data-recommendedwith'));
+            const bRecommended = checkPlayerCount(playerCount, b.getAttribute('data-recommendedwith'));
+            if (aRecommended && !bRecommended) return -1;
+            if (!aRecommended && bRecommended) return 1;
+
+            return 0; // Maintain original order if priorities are equal
         });
 
-        // 필터 상태 메시지 업데이트
+        // Re-append the sorted games to the list and apply visual styles
+        filteredGames.forEach(game => {
+            // Reset any existing highlight classes
+            game.classList.remove('best-count', 'recommended-count', 'not-recommended');
+
+            // Add highlight classes based on player count match
+            if (checkPlayerCount(playerCount, game.getAttribute('data-bestwith'))) {
+                game.classList.add('best-count');
+            } else if (checkPlayerCount(playerCount, game.getAttribute('data-recommendedwith'))) {
+                game.classList.add('recommended-count');
+            } else {
+                game.classList.add('not-recommended');
+            }
+            
+            gameList.appendChild(game);
+        });
+
+        // Update filter status message
         filterStatus.textContent = `플레이어 수 ${playerCount}명에 맞는 게임 ${visibleCount}/${totalGames}개가 표시됩니다.`;
         filterStatus.style.display = 'block';
     });
@@ -130,9 +165,18 @@ document.addEventListener('DOMContentLoaded', () => {
         // 필터 상태 메시지 초기화
         filterStatus.textContent = '';
         filterStatus.style.display = 'none';
+
+        // 게임 리스트 element들의 class 초기화
+        const gameListItems = gameList.querySelectorAll('li');
+        gameListItems.forEach(item => {
+            item.classList.remove('best-count', 'recommended-count', 'not-recommended');
+        });
+
+        sortGamesByScore(false);
+        sortGamesByWeight(false);
     });
 
-    // 나머지 기존 함수들 (fetchGameData, fetchGameDetails, getColor, sortGamesByScore, sortGamesByWeight 등)은 그대로 유지됩니다.
+    playerCountInput.value = '';
 });
 
 function openPostWindow(url, data) {
@@ -227,9 +271,7 @@ function fetchGameDetails(gameId, linkElement) {
     const cacheKey = `game_details_${gameId}`;
 
     return cachedFetch(detailsUrl, {}, cacheKey)
-        .then(response => {
-            return response.text();
-        })
+        .then(response => response.text())
         .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
         .then(data => {
             const average = data.querySelector('average').getAttribute('value');
@@ -242,13 +284,53 @@ function fetchGameDetails(gameId, linkElement) {
             const rating = average ? parseFloat(average).toFixed(2) : 'N/A';
             const weight = averageweight ? parseFloat(averageweight).toFixed(2) : 'N/A';
 
+            // Extract suggested_numplayers
+            const pollSummary = data.querySelector('poll-summary[name="suggested_numplayers"]');
+            let bestWith = 'N/A';
+            let recommendedWith = 'N/A';
+
+            if (pollSummary) {
+                const bestWithResult = pollSummary.querySelector('result[name="bestwith"]');
+                const recommendedWithResult = pollSummary.querySelector('result[name="recommendedwith"], result[name="recommmendedwith"]'); // Handling typo
+
+                if (bestWithResult) {
+                    try {
+                        bestWith = bestWithResult.getAttribute('value').split('with ')[1].split(' players')[0];
+                    } catch (e) {
+                        console.warn('bestWith 추출 에러:', e, bestWithResult.getAttribute('value'));
+                        bestWith = 'N/A';
+                    }
+                }
+
+                if (recommendedWithResult) {
+                    try {
+                        recommendedWith = recommendedWithResult.getAttribute('value').split('with ')[1].split(' players')[0];
+                    } catch (e) {
+                        console.warn('recommendedWith 추출 에러:', e, recommendedWithResult.getAttribute('value'));
+                        recommendedWith = 'N/A';
+                    }
+                }
+            }
+
+            // Update UI elements
             linkElement.parentElement.querySelector('.score').textContent = rating;
             linkElement.parentElement.querySelector('.weight').textContent = weight;
             linkElement.parentElement.querySelector('.players').textContent = `${minPlayers} - ${maxPlayers}`;
 
-            // set scoreand weight's text color per its value, red for low score, green for high score, gray for N/A or Error. red for high weight, green for low weight.
-            const scoreElement = linkElement.parentElement.querySelector('.score');
-            const weightElement = linkElement.parentElement.querySelector('.weight');
+            // Store bestWith and recommendedWith as data attributes on the <li>
+            const listItem = linkElement.parentElement;
+            listItem.setAttribute('data-bestwith', bestWith);
+            listItem.setAttribute('data-recommendedwith', recommendedWith);
+
+            // Optionally, display suggested player counts
+            const suggestedPlayersElement = document.createElement('span');
+            suggestedPlayersElement.classList.add('suggested-players');
+            suggestedPlayersElement.innerHTML = ` | Players: Best with ${bestWith}, Recommended with ${recommendedWith}`;
+            listItem.appendChild(suggestedPlayersElement);
+
+            // Set text colors based on values
+            const scoreElement = listItem.querySelector('.score');
+            const weightElement = listItem.querySelector('.weight');
             scoreElement.style.color = getColor(rating, 'score');
             weightElement.style.color = getColor(weight, 'weight');
 
@@ -260,6 +342,35 @@ function fetchGameDetails(gameId, linkElement) {
             linkElement.parentElement.querySelector('.weight').textContent = 'Error';
             return Promise.reject('Error');
         });
+}
+
+function checkPlayerCount(value, checkWith) {
+    // if checkvalue is empty, return false
+    if (checkWith === '') return false;
+    if (checkWith === 'N/A') return false;
+
+    // if checkvalue contains comma, there would be multiple or conditions. 
+    // check them one by one.
+    const checkWiths = checkWith.split(', ');
+    for (const checkWith of checkWiths) {
+        // if checkvalue is single number, return true if value is same as checkvalue
+        if (checkWith.match(/^\d+$/)) return value === parseInt(checkWith);
+
+        if (!checkWith.includes('–') && checkWith.endsWith('+')) { // caution: not hyphen, it is en dash (0x2013)
+            return value > parseInt(checkWith.slice(0, -1));
+        }
+
+        // if checkvalue is range, return true if value is between min and max of checkvalue
+        let min = checkWith.split('–')[0]; // caution: not hyphen, it is en dash (0x2013)
+        let max = checkWith.split('–')[1]; // caution: not hyphen, it is en dash (0x2013)
+        
+        if (max.endsWith('+')) max = 999;
+        if (min.endsWith('+')) min = 0;
+        min = parseInt(min);
+        max = parseInt(max);
+        if (value >= min && value <= max) return true;
+    }
+    return false;
 }
 
 function getColor(value, version) {
@@ -284,9 +395,9 @@ function getColor(value, version) {
     }
 }
 
-function sortGamesByScore() {
+function sortGamesByScore(switchOrder = true) {
     const scoreSortButton = document.getElementById('score-sort-button');
-    const order = scoreSortButton.classList.contains('desc') ? 'desc' : 'asc';
+    const order = scoreSortButton.classList.contains('desc') ^ !switchOrder ? 'desc' : 'asc';
     const gameLists = document.getElementById('game-list');
 
     const items = Array.from(gameLists.querySelectorAll('li'));
@@ -300,12 +411,12 @@ function sortGamesByScore() {
     // 정렬된 항목 다시 추가
     items.forEach(item => gameLists.appendChild(item));
 
-    scoreSortButton.classList.toggle('desc');
+    if (switchOrder) scoreSortButton.classList.toggle('desc');
 } 
 
-function sortGamesByWeight() {
+function sortGamesByWeight(switchOrder = true) {
     const weightSortButton = document.getElementById('weight-sort-button');
-    const order = weightSortButton.classList.contains('desc') ? 'desc' : 'asc';
+    const order = weightSortButton.classList.contains('desc') ^ !switchOrder ? 'desc' : 'asc';
     const gameLists = document.getElementById('game-list');
 
     const items = Array.from(gameLists.querySelectorAll('li'));
@@ -319,9 +430,8 @@ function sortGamesByWeight() {
     // 정렬된 항목 다시 추가
     items.forEach(item => gameLists.appendChild(item));
 
-    weightSortButton.classList.toggle('desc');
+    if (switchOrder) weightSortButton.classList.toggle('desc');
 }
-
 /**
  * 헬퍼 함수: 로컬 스토리지에 캐시된 데이터가 있으면 반환하고, 없으면 fetch를 수행하여 캐시에 저장한 후 반환합니다.
  * @param {string} url - 요청할 URL

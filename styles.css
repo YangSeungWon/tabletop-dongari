@@ -124,3 +124,21 @@ footer {
     font-weight: bold;
     display: none;
 }
+
+.suggested-players {
+    font-style: italic;
+    color: #555;
+    margin-left: 10px;
+}
+
+.best-count {
+    background-color: #fbffe0;
+}
+
+.recommended-count {
+    background-color: #ffffff;
+}
+
+.not-recommended {
+    background-color: #e7e7e7;
+}
