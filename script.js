@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM이 로드되었습니다. 게임 이름 매핑을 로드합니다.');
 
-    // 영어-한국어 게임 이름 매핑 로드
-    fetch('games.json')
+    // 영어-한국어 게임 이름 매핑 로드 (캐싱 적용)
+    cachedFetch('games.json', {}, 'games_json')
         .then(response => {
             console.log('games.json 파일을 성공적으로 로드했습니다.');
             return response.json();
@@ -159,12 +159,10 @@ function openPostWindow(url, data) {
 
 function fetchGameData(koreanName, englishName, linkElement) {
     const apiUrl = `https://www.boardgamegeek.com/xmlapi2/search?query=${encodeURIComponent(englishName)}&type=boardgame`;
+    const cacheKey = `search_${englishName.toLowerCase()}`;
 
-    return fetch(apiUrl)
+    return cachedFetch(apiUrl, {}, cacheKey)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP 에러! 상태: ${response.status}`);
-            }
             return response.text();
         })
         .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
@@ -174,7 +172,6 @@ function fetchGameData(koreanName, englishName, linkElement) {
             if (items.length === 1) {
                 item = items[0];
             } else {
-                // Convert NodeList to Array and sort by yearpublished in descending order
                 const matchingItems = Array.from(items)
                     .filter(item => item.querySelector('name').getAttribute('value').toLowerCase() === englishName.toLowerCase())
                     .sort((a, b) => {
@@ -188,7 +185,7 @@ function fetchGameData(koreanName, englishName, linkElement) {
                         const yearB = parseInt(b.querySelector('yearpublished').getAttribute('value') || '0');
                         return yearB - yearA;
                     });
-                item = matchingItems[0]; // Get the most recent one
+                item = matchingItems[0];
             }
             if (!item) {
                 const filterWords = ['promo'];
@@ -201,7 +198,7 @@ function fetchGameData(koreanName, englishName, linkElement) {
                 linkElement.href = gameUrl;
                 linkElement.setAttribute('bggId', id);
 
-                // 상세 게임 데이터 가져오기
+                // 상세 게임 데이터 가져오기 (캐싱 적용)
                 return fetchGameDetails(id, linkElement);
             } else {
                 console.warn(`게임을 찾을 수 없습니다: ${englishName}`);
@@ -227,12 +224,10 @@ function fetchGameData(koreanName, englishName, linkElement) {
 
 function fetchGameDetails(gameId, linkElement) {
     const detailsUrl = `https://www.boardgamegeek.com/xmlapi2/thing?id=${gameId}&stats=1`;
+    const cacheKey = `game_details_${gameId}`;
 
-    return fetch(detailsUrl)
+    return cachedFetch(detailsUrl, {}, cacheKey)
         .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP 에러! 상태: ${response.status}`);
-            }
             return response.text();
         })
         .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
@@ -325,4 +320,40 @@ function sortGamesByWeight() {
     items.forEach(item => gameLists.appendChild(item));
 
     weightSortButton.classList.toggle('desc');
+}
+
+/**
+ * 헬퍼 함수: 로컬 스토리지에 캐시된 데이터가 있으면 반환하고, 없으면 fetch를 수행하여 캐시에 저장한 후 반환합니다.
+ * @param {string} url - 요청할 URL
+ * @param {object} options - fetch 옵션
+ * @param {string} cacheKey - 로컬 스토리지에 저장할 키
+ * @returns {Promise<Response>} - fetch 응답
+ */
+function cachedFetch(url, options = {}, cacheKey = null) {
+    // 캐시 키가 제공되지 않으면 URL을 키로 사용
+    const key = cacheKey || url;
+
+    // 로컬 스토리지에서 캐시된 데이터 검색
+    const cached = localStorage.getItem(key);
+    if (cached) {
+        console.log(`캐시된 데이터를 반환합니다: ${key}`);
+        // 캐시된 데이터를 반환
+        return Promise.resolve(new Response(new Blob([cached])));
+    }
+
+    // 네트워크 요청 수행
+    return fetch(url, options)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP 에러! 상태: ${response.status}`);
+            }
+            return response.clone().text().then(data => {
+                try {
+                    localStorage.setItem(key, data);
+                } catch (e) {
+                    console.warn('로컬 스토리지 저장 실패:', e);
+                }
+                return response;
+            });
+        });
 }
