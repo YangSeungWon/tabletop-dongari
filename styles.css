@@ -69,17 +69,39 @@ footer {
 }
 
 .sort-button {
-    margin-left: 20px;
+    margin-left: 10px;
     padding: 5px 10px;
-    background-color: #2E8B57;
     color: white;
-    border: none;
+    border: 3px solid #ffffff;
     cursor: pointer;
     border-radius: 4px;
+    font-weight: bold;
 }
 
 .sort-button:hover {
-    background-color: #276749;
+    filter: brightness(0.9);
+    border: 3px solid #d9ff00;
+}
+
+.better-gradient {
+    background-image: linear-gradient(to right, #770000, #007700);
+}
+
+.worse-gradient {
+    background-image: linear-gradient(to right, #770000, #007700);
+}
+
+.better-gradient.recently-sorted {
+    background-image: linear-gradient(to right, #c93737, #42c942);
+}
+
+.worse-gradient.recently-sorted {
+    background-image: linear-gradient(to right, #42c942, #c93737);
+}
+
+.recently-sorted {
+    border: 3px solid #d9ff00;
+    border-radius: 4px;
 }
 
 /* 필터 섹션 스타일링 */
@@ -141,4 +163,20 @@ footer {
 
 .not-recommended {
     background-color: #e7e7e7;
+}
+
+#game-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#game-table th, #game-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+#game-table th {
+    background-color: #f2f2f2;
+    font-weight: bold;
 }

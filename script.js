@@ -16,15 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (koreanName.includes('|')) {
                     [processedKoreanName, bggId] = koreanName.split('|');
                 }
-                const li = document.createElement('li');
-                li.innerHTML = `<a href="#" target="_blank" class="bgg-link" englishName="${englishName}" ${bggId ? `bggId="${bggId}"` : ''}>
-                    ${processedKoreanName}
-                </a> - 
-                <span class="score">Loading...</span>
-                <span class="weight">Loading...</span>
-                <span class="players">Loading...</span>`;
-                
-                gameList.appendChild(li);
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="#" target="_blank" class="bgg-link" englishName="${englishName}" ${bggId ? `bggId="${bggId}"` : ''}>
+                        ${processedKoreanName}
+                    </a></td>
+                    <td class="score">Loading...</td>
+                    <td class="weight">Loading...</td>
+                    <td class="best-players">Loading...</td>
+                    <td class="recommended-players">Loading...</td>
+                    <td class="players">Loading...</td>
+                `;
+                gameList.appendChild(tr);
             }
 
             const links = document.querySelectorAll('.bgg-link');
@@ -82,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 실시간 필터 적용: input 이벤트 리스너 추가
     playerCountInput.addEventListener('input', () => {
         const playerCount = parseInt(playerCountInput.value, 10);
-        const games = Array.from(gameList.querySelectorAll('li'));
+        const games = Array.from(gameList.querySelectorAll('tr'));
         let visibleCount = 0;
         const totalGames = games.length;
 
@@ -157,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerCountInput.value = '';
         
         // 모든 게임 표시
-        const games = gameList.querySelectorAll('li');
+        const games = gameList.querySelectorAll('tr');
         games.forEach(game => {
             game.style.display = '';
         });
@@ -167,13 +170,13 @@ document.addEventListener('DOMContentLoaded', () => {
         filterStatus.style.display = 'none';
 
         // 게임 리스트 element들의 class 초기화
-        const gameListItems = gameList.querySelectorAll('li');
+        const gameListItems = gameList.querySelectorAll('tr');
         gameListItems.forEach(item => {
             item.classList.remove('best-count', 'recommended-count', 'not-recommended');
         });
 
-        sortGamesByScore(false);
-        sortGamesByWeight(false);
+        sortGamesByScore('desc');
+        sortGamesByWeight('asc');
     });
 
     playerCountInput.value = '';
@@ -254,14 +257,15 @@ function fetchGameData(koreanName, englishName, linkElement) {
                     page: "game"
                 };
                 openPostWindow(boardlifeUrl, boardlifeData);
-
-                linkElement.nextElementSibling.textContent = 'N/A';
+                linkElement.parentElement.parentElement.querySelector('.score').textContent = 'N/A';
+                linkElement.parentElement.parentElement.querySelector('.weight').textContent = 'N/A';
                 throw new Error('게임을 찾을 수 없습니다.');
             }
         })
         .catch(error => {
             console.error('보드게임 데이터 가져오기 에러:', error);
-            linkElement.nextElementSibling.textContent = 'Error';
+            linkElement.parentElement.parentElement.querySelector('.score').textContent = 'Error';
+            linkElement.parentElement.parentElement.querySelector('.weight').textContent = 'Error';
             return Promise.reject('Error');
         });
 }
@@ -313,20 +317,20 @@ function fetchGameDetails(gameId, linkElement) {
             }
 
             // Update UI elements
-            linkElement.parentElement.querySelector('.score').textContent = rating;
-            linkElement.parentElement.querySelector('.weight').textContent = weight;
-            linkElement.parentElement.querySelector('.players').textContent = `${minPlayers} - ${maxPlayers}`;
+            linkElement.parentElement.parentElement.querySelector('.score').textContent = rating;
+            linkElement.parentElement.parentElement.querySelector('.weight').textContent = weight;
+            linkElement.parentElement.parentElement.querySelector('.players').textContent = `${minPlayers} - ${maxPlayers}`;
 
             // Store bestWith and recommendedWith as data attributes on the <li>
-            const listItem = linkElement.parentElement;
+            const listItem = linkElement.parentElement.parentElement;
             listItem.setAttribute('data-bestwith', bestWith);
             listItem.setAttribute('data-recommendedwith', recommendedWith);
 
             // Optionally, display suggested player counts
-            const suggestedPlayersElement = document.createElement('span');
-            suggestedPlayersElement.classList.add('suggested-players');
-            suggestedPlayersElement.innerHTML = ` | Players: Best with ${bestWith}, Recommended with ${recommendedWith}`;
-            listItem.appendChild(suggestedPlayersElement);
+            const bestPlayersElement = listItem.querySelector('.best-players');
+            bestPlayersElement.innerHTML = bestWith;
+            const recommendedPlayersElement = listItem.querySelector('.recommended-players');
+            recommendedPlayersElement.innerHTML = recommendedWith;
 
             // Set text colors based on values
             const scoreElement = listItem.querySelector('.score');
@@ -338,8 +342,8 @@ function fetchGameDetails(gameId, linkElement) {
         })
         .catch(error => {
             console.error('게임 상세 데이터 에러:', error);
-            linkElement.parentElement.querySelector('.score').textContent = 'Error';
-            linkElement.parentElement.querySelector('.weight').textContent = 'Error';
+            linkElement.parentElement.parentElement.querySelector('.score').textContent = 'Error';
+            linkElement.parentElement.parentElement.querySelector('.weight').textContent = 'Error';
             return Promise.reject('Error');
         });
 }
@@ -377,9 +381,9 @@ function getColor(value, version) {
     if (value === 'N/A' || value === 'Error') return '#95a5a6';
     
     if (version === 'score') {
-        // Linear interpolation between red (#c0392b) and green (#27ae60) based on score 5-10
+        // Linear interpolation between red (#c0392b) and green (#27ae60) based on score 5-9
         const score = parseFloat(value);
-        const t = Math.max(0, Math.min(1, (score - 5) / 5)); // Normalize to 0-1 range
+        const t = Math.max(0, Math.min(1, (score - 5) / 4)); // Normalize to 0-1 range
         const r = Math.round(192 * (1-t) + 39 * t);
         const g = Math.round(57 * (1-t) + 174 * t);
         const b = Math.round(43 * (1-t) + 96 * t);
@@ -395,43 +399,52 @@ function getColor(value, version) {
     }
 }
 
-function sortGamesByScore(switchOrder = true) {
-    const scoreSortButton = document.getElementById('score-sort-button');
-    const order = scoreSortButton.classList.contains('desc') ^ !switchOrder ? 'desc' : 'asc';
+function sortGames(sortButton, selector, forceTo = null) {
+    const order = forceTo ? forceTo : sortButton.classList.contains('desc') ? 'asc' : 'desc';
+    const previousOrder = sortButton.classList.contains('desc') ? 'desc' : 'asc';
+    const switchOrder = previousOrder !== order;
     const gameLists = document.getElementById('game-list');
 
-    const items = Array.from(gameLists.querySelectorAll('li'));
+    console.log('sortGames', sortButton, selector, order, previousOrder, switchOrder);
+
+    const items = Array.from(gameLists.querySelectorAll('tr'));
 
     items.sort((a, b) => {
-        const scoreA = parseFloat(a.querySelector('.score').textContent) || 0;
-        const scoreB = parseFloat(b.querySelector('.score').textContent) || 0;
+        const scoreA = parseFloat(a.querySelector(selector).textContent) || 0;
+        const scoreB = parseFloat(b.querySelector(selector).textContent) || 0;
         return order === 'desc' ? scoreB - scoreA : scoreA - scoreB;
     });
 
     // 정렬된 항목 다시 추가
     items.forEach(item => gameLists.appendChild(item));
 
-    if (switchOrder) scoreSortButton.classList.toggle('desc');
-} 
+    const recentlySortedButtons = document.getElementsByClassName('recently-sorted');
+    for (const recentlySortedButton of recentlySortedButtons) {
+        recentlySortedButton.classList.remove('recently-sorted');
+    }
+    sortButton.classList.add('recently-sorted');
 
-function sortGamesByWeight(switchOrder = true) {
-    const weightSortButton = document.getElementById('weight-sort-button');
-    const order = weightSortButton.classList.contains('desc') ^ !switchOrder ? 'desc' : 'asc';
-    const gameLists = document.getElementById('game-list');
+    if (switchOrder) {
+        sortButton.classList.toggle('better-gradient');
+        sortButton.classList.toggle('worse-gradient');
+        sortButton.classList.toggle('desc');
 
-    const items = Array.from(gameLists.querySelectorAll('li'));
-
-    items.sort((a, b) => {
-        const weightA = parseFloat(a.querySelector('.weight').textContent) || 0;
-        const weightB = parseFloat(b.querySelector('.weight').textContent) || 0;
-        return order === 'desc' ? weightB - weightA : weightA - weightB;
-    });
-
-    // 정렬된 항목 다시 추가
-    items.forEach(item => gameLists.appendChild(item));
-
-    if (switchOrder) weightSortButton.classList.toggle('desc');
+        const [a, b] = sortButton.textContent.split('▶︎').map(s => s.trim());
+        sortButton.textContent = `${b} ▶︎ ${a}`;
+    }
+    return;
 }
+
+function sortGamesByScore(forceTo = null) {
+    const scoreSortButton = document.getElementById('score-sort-button');
+    sortGames(scoreSortButton, '.score', forceTo);
+}
+
+function sortGamesByWeight(forceTo = null) {
+    const weightSortButton = document.getElementById('weight-sort-button');
+    sortGames(weightSortButton, '.weight', forceTo);
+}
+
 /**
  * 헬퍼 함수: 로컬 스토리지에 캐시된 데이터가 있으면 반환하고, 없으면 fetch를 수행하여 캐시에 저장한 후 반환합니다.
  * @param {string} url - 요청할 URL

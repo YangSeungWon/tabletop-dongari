@@ -32,7 +32,7 @@
         <a href="/form-pref" class="button">선호도 조사 제출하기</a>
     </section>
     <section id="games">
-        <h2>보유 보드게임 목록 <button class="sort-button desc" id="score-sort-button">스코어 기준 정렬 (1~10)</button> <button class="sort-button" id="weight-sort-button">난이도 기준 정렬 (1~5)</button></h2>
+        <h2>보유 보드게임 목록</h2>
         
         <div id="filters">
             <label for="player-count">플레이어 수:</label>
@@ -45,8 +45,21 @@
             <!-- 필터 상태 메시지가 여기에 표시됩니다 -->
         </div>
         
-        <ul id="game-list">
-        </ul>
+        <table id="game-table">
+            <thead>
+                <tr>
+                    <th>게임 이름</th>
+                    <th>평점<button class="sort-button desc worse-gradient" id="score-sort-button">10 ▶︎ 1</button></th>
+                    <th>난도<button class="sort-button worse-gradient" id="weight-sort-button">1 ▶︎ 5</button></th>
+                    <th>베스트 인원</th>
+                    <th>추천 인원</th>
+                    <th>가능 인원</th>
+                </tr>
+            </thead>
+            <tbody id="game-list">
+                <!-- JavaScript로 생성된 게임 항목들이 여기에 추가됩니다. -->
+            </tbody>
+        </table>
     </section>
     <section id="announcement">
         <h2>공지사항</h2>
