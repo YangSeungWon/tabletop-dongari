@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>테이블탑: 포스텍 대학원 보드게임 동아리</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js"></script>
 </head>
 <body>
     <header>
@@ -28,50 +29,11 @@
         <p><img src="code.png" alt="참여 코드" style="width: 100%; max-width: 150px;"></p>
         <a href="/talk" class="button">오픈카톡 참여하기</a>
         <a href="/form" class="button">구글 폼 제출하기</a>
+        <a href="/form-pref" class="button">선호도 조사 제출하기</a>
     </section>
     <section id="games">
-        <h2>보유 보드게임 목록</h2>
-        <h3>완전 파티게임</h3>
-        <ul>
-            <li>스틱스택</li>
-            <li>코요테</li>
-            <li>두리안</li>
-            <li>타코 캣 고트 치즈 피자</li>
-            <li>피트</li>
-            <li>달밤의 베개 싸움</li>
-            <li>윙크</li>
-            <li>3초 트라이!</li>
-            <li>스위스 사는 스미스씨</li>
-            <li>요호호 해적 고양이</li>
-            <li>헤이요</li>
-            <li>셀레스티아</li>
-        </ul>
-        <h3>파티게임</h3>
-        <ul>
-            <li>딕싯</li>
-            <li>코드네임</li>
-            <li>한밤의 늑대인간</li>
-            <li>라스베가스</li>
-            <li>노터치 크라켄 미니</li>
-            <li>지도 제작자들</li>
-            <li>쇼텐토텐 1&2</li>
-            <li>도코종</li>
-        </ul>
-        <h3>가벼운 전략게임</h3>
-        <ul>
-            <li>에버델</li>
-            <li>캐스캐디아</li>
-            <li>행성X를 찾아서</li>
-            <li>오션스</li>
-            <li>기즈모</li>
-        </ul>
-        <h3>전략게임</h3>
-        <ul>
-            <li>정령섬 + 가지와 발톱</li>
-            <li>더 루프</li>
-            <li>아크노바</li>
-            <li>브라스 버밍엄</li>
-            <li>듄: 임페리움 - 봉기</li>
+        <h2>보유 보드게임 목록 <button class="sort-button desc" id="score-sort-button">스코어 기준 정렬 (1~10)</button> <button class="sort-button" id="weight-sort-button">난이도 기준 정렬 (1~5)</button></h2>
+        <ul id="game-list">
         </ul>
     </section>
     <section id="announcement">

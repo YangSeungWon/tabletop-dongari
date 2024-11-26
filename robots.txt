@@ -1,4 +1,5 @@
 User-agent: *
 Disallow: /form
+Disallow: /form-pref
 Disallow: /talk
 
