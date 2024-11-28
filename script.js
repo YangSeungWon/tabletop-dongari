@@ -380,23 +380,36 @@ function checkPlayerCount(value, checkWith) {
     // if checkvalue contains comma, there would be multiple or conditions. 
     // check them one by one.
     const checkWiths = checkWith.split(', ');
-    for (const checkWith of checkWiths) {
+    for (const cw of checkWiths) {
         // if checkvalue is single number, return true if value is same as checkvalue
-        if (checkWith.match(/^\d+$/)) return value === parseInt(checkWith);
+        if (cw.match(/^\d+$/)) {
+            if (value === parseInt(cw)) {
+                return true;
+            } else {
+                continue;
+            }
+        }
 
-        if (!checkWith.includes('–') && checkWith.endsWith('+')) { // caution: not hyphen, it is en dash (0x2013)
-            return value > parseInt(checkWith.slice(0, -1));
+        if (!cw.includes('–') && cw.endsWith('+')) { // caution: not hyphen, it is en dash (0x2013)
+            if (value > parseInt(cw.slice(0, -1))) {
+                return true;
+            } else {
+                continue;
+            }
         }
 
         // if checkvalue is range, return true if value is between min and max of checkvalue
-        let min = checkWith.split('–')[0]; // caution: not hyphen, it is en dash (0x2013)
-        let max = checkWith.split('–')[1]; // caution: not hyphen, it is en dash (0x2013)
+        let [min, max] = cw.split('–'); // caution: not hyphen, it is en dash (0x2013)
         
         if (max.endsWith('+')) max = 999;
         if (min.endsWith('+')) min = 0;
         min = parseInt(min);
         max = parseInt(max);
-        if (value >= min && value <= max) return true;
+        if (value >= min && value <= max) {
+            return true;
+        } else {
+            continue;
+        }
     }
     return false;
 }
