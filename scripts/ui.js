@@ -1,5 +1,5 @@
 import { fetchGameData, fetchGameDetails, openPostWindow } from './api.js';
-import { parsePlaytime, checkPlayerCount, getColor } from './utils.js';
+import { parsePlaytime, checkPlayerCount } from './utils.js';
 import { fetchMeetings } from './logs.js';
 
 /**
@@ -61,6 +61,9 @@ export function initializeGameList(nameMapping) {
             openPostWindow(boardlifeUrl, boardlifeData);
         }
     });
+
+    const playerCountInput = document.getElementById('player-count');
+    playerCountInput.value = '';
 
     initializeRecentPlayed();
 
