@@ -1,8 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM이 로드되었습니다. 게임 이름 매핑을 로드합니다.');
 
-    // 영어-한국어 게임 이름 매핑 로드 (캐싱 적용)
-    cachedFetch('games.json', {}, 'games_json')
+    // 영어-한국어 게임 이름 매핑 로드 
+    fetch('games.json')
         .then(response => {
             console.log('games.json 파일을 성공적으로 로드했습니다.');
             return response.json();
@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(async nameMapping => {
             // Create list items for each game
             const gameList = document.getElementById('game-list');
+            let initialOrder = 0; // 초기 순서 카운터
+
             for (const [koreanName, englishName] of Object.entries(nameMapping)) {
                 let processedKoreanName = koreanName;
                 let bggId = null;
@@ -17,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     [processedKoreanName, bggId] = koreanName.split('|');
                 }
                 const tr = document.createElement('tr');
+                tr.setAttribute('data-order', initialOrder++); // 초기 순서 저장
                 tr.innerHTML = `
                     <td><a href="#" target="_blank" class="bgg-link" englishName="${englishName}" ${bggId ? `bggId="${bggId}"` : ''}>
                         ${processedKoreanName}
@@ -49,8 +52,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     await fetchGameData(koreanName, englishName, link);
                 } else {
                     console.warn(`영어 이름을 찾을 수 없습니다: ${koreanName}`);
-                    link.parentElement.querySelector('.score').textContent = 'N/A';
-                    link.parentElement.querySelector('.weight').textContent = 'N/A';
+                    // 영어 이름이 없는 경우 보드라이프 검색 페이지로 이동
+                    const boardlifeUrl = `https://boardlife.co.kr/search_ajax.php`;
+                    const boardlifeData = {
+                        action: "CallPage",
+                        query: koreanName,      
+                        page: "game"
+                    };
+                    openPostWindow(boardlifeUrl, boardlifeData);
                 }
             });
 
@@ -131,7 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (aRecommended && !bRecommended) return -1;
             if (!aRecommended && bRecommended) return 1;
 
-            return 0; // Maintain original order if priorities are equal
+            // 우선순위가 동일한 경우 초기 순서 기준
+            const aOrder = parseInt(a.getAttribute('data-order'), 10);
+            const bOrder = parseInt(b.getAttribute('data-order'), 10);
+            return aOrder - bOrder;
         });
 
         // Re-append the sorted games to the list and apply visual styles
@@ -447,22 +459,29 @@ function sortGames(sortButton, selector, forceTo = null) {
     const items = Array.from(gameLists.querySelectorAll('tr'));
 
     items.sort((a, b) => {
-        const textA = a.querySelector(selector).textContent.trim();
-        const textB = b.querySelector(selector).textContent.trim();
-
+        let comparison = 0;
         if (selector === '.playtime') {
-            const timeA = parsePlaytime(textA);
-            const timeB = parsePlaytime(textB);
-            return order === 'desc' ? timeB - timeA : timeA - timeB;
+            const timeA = parsePlaytime(a.querySelector(selector).textContent.trim());
+            const timeB = parsePlaytime(b.querySelector(selector).textContent.trim());
+            comparison = order === 'desc' ? timeB - timeA : timeA - timeB;
         } else {
-            return order === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
+            const textA = a.querySelector(selector).textContent.trim();
+            const textB = b.querySelector(selector).textContent.trim();
+            comparison = order === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
         }
+
+        if (comparison !== 0) return comparison;
+
+        // 보조 정렬 기준: 초기 순서
+        const aOrder = parseInt(a.getAttribute('data-order'), 10);
+        const bOrder = parseInt(b.getAttribute('data-order'), 10);
+        return aOrder - bOrder;
     });
 
-    // Re-append sorted items
+    // 정렬된 항목 다시 추가
     items.forEach(item => gameLists.appendChild(item));
 
-    // Update button styles and text
+    // 버튼 스타일 및 애니메이션 처리
     const recentlySortedButtons = document.getElementsByClassName('recently-sorted');
     for (const recentlySortedButton of recentlySortedButtons) {
         recentlySortedButton.classList.remove('recently-sorted');
@@ -478,7 +497,7 @@ function sortGames(sortButton, selector, forceTo = null) {
         sortButton.textContent = `${b} ▶︎ ${a}`;
     }
 
-    // Add animation
+    // 애니메이션 추가
     gameLists.classList.add('sorting');
     setTimeout(() => {
         gameLists.classList.remove('sorting');
@@ -506,7 +525,7 @@ function sortGamesByPlaytime(forceTo = null) {
 }
 
 /**
- * 헬퍼 함수: 로컬 스토리지에 캐시된 데이터가 있으면 반환하고, 없으면 fetch를 수행하여 캐시에 저장한 후 반환합니다.
+ * 헬퍼 함수: 로컬 스토리지에 캐시된 데이터가 있으면 반환하고, 없으면 fetch를 수행하여 캐시에 저장한 후 반환합다.
  * @param {string} url - 요청할 URL
  * @param {object} options - fetch 옵션
  * @param {string} cacheKey - 로컬 스토리지에 저장할 키
