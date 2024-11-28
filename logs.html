@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>테이블탑: 모임 일지</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <script type="module" src="scripts/logs.js" defer></script>
+</head>
+<body>
+    <header>
+        <h1>테이블탑: 포스텍 대학원 보드게임 동아리</h1>
+        <nav>
+            <a href="index.html" class="button">홈</a>
+            <a href="game.html" class="button">게임 목록</a>
+            <a href="logs.html" class="button">모임 일지</a>
+        </nav>
+    </header>
+    
+    <section id="meeting-logs">
+        <h2>모임 일지</h2>
+        <table id="log-table">
+            <thead>
+                <tr>
+                    <th>날짜</th>
+                    <th>플레이한 게임</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- meetings.json에서 불러온 모임 일지가 여기에 표시됩니다 -->
+            </tbody>
+        </table>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 테이블탑 대학원 보드게임 동아리</p>
+    </footer>
+</body>
+</html>
