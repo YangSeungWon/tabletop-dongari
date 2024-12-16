@@ -3,6 +3,32 @@ import { parsePlaytime, checkPlayerCount } from './utils.js';
 import { fetchMeetings } from './logs.js';
 
 /**
+ * 필터 레벨 슬라이더를 생성하고 초기화합니다.
+ */
+function createFilterLevelSlider() {
+    const filterControls = document.createElement('div');
+    filterControls.className = 'filter-controls';
+    filterControls.style.display = 'none'; // 초기에는 숨김
+
+    filterControls.innerHTML = `
+            <label for="filter-level">필터 레벨:</label>
+        <div class="slider-container">
+            <input type="range" id="filter-level" min="0" max="2" value="0" step="1" class="slider" title="필터 레벨">
+        </div>
+    `;
+
+    // 플레이어 수 입력 필드 다음에 슬라이더 삽입
+    const playerCountInput = document.getElementById('player-count');
+    playerCountInput.parentNode.insertBefore(filterControls, playerCountInput.nextSibling);
+
+    // 슬라이더 스타일 초기화
+    const filterLevelSlider = document.getElementById('filter-level');
+    filterLevelSlider.style.setProperty('--slider-color', '#d3d3d3');
+
+    return filterControls;
+}
+
+/**
  * 게임 리스트를 초기화합니다.
  * @param {Object} nameMapping
  */
@@ -33,6 +59,9 @@ export function initializeGameList(nameMapping) {
         gameList.appendChild(tr);
     }
 
+    // 필터 레벨 슬라이더 생성
+    createFilterLevelSlider();
+
     const links = document.querySelectorAll('.bgg-link');
     const promises = Array.from(links).map(async link => {
         const koreanName = link.textContent.trim();
@@ -46,7 +75,7 @@ export function initializeGameList(nameMapping) {
             await fetchGameDetails(bggId, link);
             return;
         }
-        
+
         if (englishName) {
             await fetchGameData(koreanName, englishName, link);
         } else {
@@ -55,7 +84,7 @@ export function initializeGameList(nameMapping) {
             const boardlifeUrl = `https://boardlife.co.kr/search_ajax.php`;
             const boardlifeData = {
                 action: "CallPage",
-                query: koreanName,      
+                query: koreanName,
                 page: "game"
             };
             openPostWindow(boardlifeUrl, boardlifeData);
@@ -112,6 +141,10 @@ export function initializeEventListeners() {
     const nameSortButton = document.getElementById('name-sort-button');
     const playtimeSortButton = document.getElementById('playtime-sort-button');
     const dateSortButton = document.getElementById('date-sort-button');
+    const filterLevelSlider = document.getElementById('filter-level');
+
+    // Initialize slider appearance
+    updateSliderAppearance(0);
 
     // 정렬 버튼 이벤트 리스너
     scoreSortButton.addEventListener('click', () => {
@@ -125,6 +158,16 @@ export function initializeEventListeners() {
 
     // 필터 기능 이벤트 리스너
     playerCountInput.addEventListener('input', handlePlayerCountInput);
+    filterLevelSlider.addEventListener('input', handlePlayerCountInput);
+
+    // 슬라이더 스텝 이동을 위한 레이블 클릭 이벤트
+    document.querySelectorAll('.filter-label').forEach((label, index) => {
+        label.addEventListener('click', () => {
+            filterLevelSlider.value = index;
+            handlePlayerCountInput();
+        });
+    });
+
     resetButton.addEventListener('click', handleReset);
 
     // 추가 정렬 버튼 이벤트 리스너
@@ -147,12 +190,25 @@ export function initializeEventListeners() {
  */
 function handlePlayerCountInput() {
     const playerCountInput = document.getElementById('player-count');
+    const filterControls = document.querySelector('.filter-controls');
+    const filterLevelSlider = document.getElementById('filter-level');
+    const filterLevel = filterLevelSlider.value; // 0: all, 1: recommended+best, 2: best only
     const playerCount = parseInt(playerCountInput.value, 10);
     const gameList = document.getElementById('game-list');
     const games = Array.from(gameList.querySelectorAll('tr'));
     let visibleCount = 0;
     const totalGames = games.length;
-    const filterStatus = document.getElementById('filter-status'); // 필터 상태 메시지 요소
+    const filterStatus = document.getElementById('filter-status');
+
+    // 플레이어 수가 있을 때만 슬라이더 표시
+    if (!isNaN(playerCount) && playerCount >= 1) {
+        filterControls.style.display = 'block';
+        // Update slider appearance
+        updateSliderAppearance(filterLevel);
+    } else {
+        filterControls.style.display = 'none';
+        filterLevelSlider.value = 0; // 슬라이더 값 초기화
+    }
 
     // Prevent non-numeric input
     if (playerCount !== parseInt(playerCountInput.value, 10)) {
@@ -160,7 +216,6 @@ function handlePlayerCountInput() {
     }
 
     if (isNaN(playerCount) || playerCount < 1) {
-        // Invalid input: Show all games and reset filter status
         games.forEach(game => {
             game.style.display = '';
         });
@@ -169,18 +224,31 @@ function handlePlayerCountInput() {
         return;
     }
 
-    // Filter games based on player count
+    // Filter games based on player count and filter level
     const filteredGames = games.filter(game => {
         const playersText = game.querySelector('.players').textContent;
         const [gameMin, gameMax] = playersText.split(' - ').map(num => parseInt(num, 10));
+        const isInRange = playerCount >= gameMin && playerCount <= gameMax;
 
-        // Check if playerCount is within the game's player range
-        const isVisible = playerCount >= gameMin && playerCount <= gameMax;
-        if (isVisible) {
-            visibleCount++;
+        if (!isInRange) return false;
+
+        const isBest = checkPlayerCount(playerCount, game.getAttribute('data-bestwith'));
+        const isRecommended = checkPlayerCount(playerCount, game.getAttribute('data-recommendedwith'));
+
+        // Apply filter level
+        if (filterLevel == 2) {
+            return isBest;
+        } else if (filterLevel == 1) {
+            return isBest || isRecommended;
         }
+        return true; // filterLevel == 0, show all playable games
+    });
+
+    // Update visibility and count
+    games.forEach(game => {
+        const isVisible = filteredGames.includes(game);
         game.style.display = isVisible ? '' : 'none';
-        return isVisible;
+        if (isVisible) visibleCount++;
     });
 
     // Sort the filtered games based on priority
@@ -196,18 +264,15 @@ function handlePlayerCountInput() {
         if (aRecommended && !bRecommended) return -1;
         if (!aRecommended && bRecommended) return 1;
 
-        // 우선순위가 동일한 경우 초기 순서 기준
         const aOrder = parseInt(a.getAttribute('data-order'), 10);
         const bOrder = parseInt(b.getAttribute('data-order'), 10);
         return aOrder - bOrder;
     });
 
-    // Re-append the sorted games to the list and apply visual styles
+    // Re-append the sorted games and apply visual styles
     filteredGames.forEach(game => {
-        // Reset any existing highlight classes
         game.classList.remove('best-count', 'recommended-count', 'not-recommended');
 
-        // Add highlight classes based on player count match
         if (checkPlayerCount(playerCount, game.getAttribute('data-bestwith'))) {
             game.classList.add('best-count');
         } else if (checkPlayerCount(playerCount, game.getAttribute('data-recommendedwith'))) {
@@ -215,15 +280,18 @@ function handlePlayerCountInput() {
         } else {
             game.classList.add('not-recommended');
         }
-        
+
         gameList.appendChild(game);
     });
 
-    // Update filter status message
-    filterStatus.textContent = `플레이어 수 ${playerCount}명에 맞는 게임 ${visibleCount}/${totalGames}개가 표시됩니다.`;
+    // Update filter status message with filter level info
+    let filterLevelText = '';
+    if (filterLevel == 2) filterLevelText = ' (베스트)';
+    else if (filterLevel == 1) filterLevelText = ' (추천↑)';
+
+    filterStatus.textContent = `플레이어 수 ${playerCount}명에 맞는 게임 ${visibleCount}/${totalGames}개가 표시됩니다${filterLevelText}`;
     filterStatus.style.display = 'block';
 
-    // add animation
     gameList.classList.add('sorting');
     setTimeout(() => {
         gameList.classList.remove('sorting');
@@ -231,16 +299,37 @@ function handlePlayerCountInput() {
 }
 
 /**
+ * 슬라이더의 시각적 상태를 업데이트합니다.
+ * @param {string} level - 현재 필터 레벨 (0, 1, 2)
+ */
+function updateSliderAppearance(level) {
+    const filterLevelSlider = document.getElementById('filter-level');
+
+    // Update slider color based on level
+    const colors = ['#d3d3d3', '#ffd700', '#4CAF50'];
+    filterLevelSlider.style.setProperty('--slider-color', colors[level]);
+
+    // Update tooltip based on level
+    const tooltips = ['모든 게임', '추천 이상', '베스트'];
+    filterLevelSlider.title = tooltips[level];
+}
+
+/**
  * 리셋 버튼 처리
  */
 function handleReset() {
     const playerCountInput = document.getElementById('player-count');
+    const filterControls = document.querySelector('.filter-controls');
+    const filterLevelSlider = document.getElementById('filter-level');
     const gameList = document.getElementById('game-list');
-    const filterStatus = document.getElementById('filter-status'); // 필터 상태 메시지 요소
+    const filterStatus = document.getElementById('filter-status');
 
     // 필터 입력 초기화
     playerCountInput.value = '';
-    
+    filterLevelSlider.value = 0;
+    filterControls.style.display = 'none'; // 슬라이더 숨김
+    updateSliderAppearance(0);
+
     // 모든 게임 표시
     const games = gameList.querySelectorAll('tr');
     games.forEach(game => {
