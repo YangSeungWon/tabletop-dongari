@@ -88,7 +88,9 @@ export function openPostWindow(url, data) {
  * @returns {Promise<void>}
  */
 export async function fetchGameData(koreanName, englishName, linkElement) {
-    const apiUrl = `https://www.boardgamegeek.com/xmlapi2/search?query=${encodeURIComponent(englishName)}&type=boardgame`;
+    const hosts = ['boardgamegeek.com', 'rpggeek.com', 'videogamegeek.com'];
+    const host = hosts[Math.floor(Math.random() * hosts.length)];
+    const apiUrl = `https://${host}/xmlapi2/search?query=${encodeURIComponent(englishName)}&type=boardgame`;
     const cacheKey = `search_${englishName.toLowerCase()}`;
 
     return cachedFetch(apiUrl, cacheKey)

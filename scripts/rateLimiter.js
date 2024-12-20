@@ -44,7 +44,7 @@ export class RateLimiter {
                     console.warn(`요청 실패: ${response.status}. 재시도 ${retries + 1}/${this.maxRetries}...`);
                     setTimeout(() => {
                         this.enqueue(request, retries + 1).then(resolve).catch(reject);
-                    }, this.retryDelay);
+                    }, this.retryDelay * (2 ** retries));
                 } else {
                     console.error(`요청 실패: ${response.status}. 최대 재시도 횟수 초과.`);
                     reject(new Error(`HTTP 에러! 상태: ${response.status}`));
