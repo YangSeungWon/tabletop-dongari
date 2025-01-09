@@ -18,10 +18,10 @@ async function loadWishlistItems() {
         const wishlist = await fetchWishlist();
         wishlistItems.innerHTML = '';
 
-        for (const [koreanName, englishName] of Object.entries(wishlist)) {
+        for (const [koreanName, gameData] of Object.entries(wishlist)) {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><a href="#" target="_blank" class="bgg-link" englishName="${englishName}">
+                <td><a href="#" target="_blank" class="bgg-link" englishName="${gameData.englishName}">
                     ${koreanName}
                 </a></td>
                 <td class="score">...</td>
@@ -30,18 +30,23 @@ async function loadWishlistItems() {
                 <td class="recommended-players">...</td>
                 <td class="players">...</td>
                 <td class="playtime">...</td>
+                <td class="reason">${gameData.reason}</td>
             `;
             wishlistItems.appendChild(tr);
 
             const link = tr.querySelector('.bgg-link');
             try {
-                await fetchGameData(koreanName, englishName, link);
+                if (gameData.englishName && typeof gameData.englishName === 'string') {
+                    await fetchGameData(koreanName, gameData.englishName, link);
+                } else {
+                    console.warn(`영어 이름이 없습니다: ${koreanName}`);
+                }
             } catch (error) {
                 console.error(`게임 데이터 로드 중 에러 (${koreanName}):`, error);
             }
         }
     } catch (error) {
         console.error('위시리스트 로드 중 에러:', error);
-        wishlistItems.innerHTML = '<tr><td colspan="7">위시리스트를 불러오는 중 오류가 발생했습니다.</td></tr>';
+        wishlistItems.innerHTML = '<tr><td colspan="8">위시리스트를 불러오는 중 오류가 발생했습니다.</td></tr>';
     }
 } 

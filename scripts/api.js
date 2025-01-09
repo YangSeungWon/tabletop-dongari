@@ -136,7 +136,7 @@ export async function fetchGameData(koreanName, englishName, linkElement) {
                 const boardlifeUrl = `https://boardlife.co.kr/search_ajax.php`;
                 const boardlifeData = {
                     action: "CallPage",
-                    query: koreanName,      
+                    query: koreanName,
                     page: "game"
                 };
                 openPostWindow(boardlifeUrl, boardlifeData);
