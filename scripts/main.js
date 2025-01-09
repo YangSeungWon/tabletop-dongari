@@ -1,6 +1,6 @@
 import { fetchGames } from './api.js';
 import { initializeGameList, initializeEventListeners, sortGamesByScore, sortGamesByWeight } from './ui.js';
-
+import { initializeWishlist } from './wishlist.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM이 로드되었습니다. 게임 이름 매핑을 로드합니다.');
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             initializeEventListeners();
             sortGamesByScore('desc');
             sortGamesByWeight('asc');
+            initializeWishlist();
         })
         .catch(error => {
             console.error('games.json 로드 에러:', error);
