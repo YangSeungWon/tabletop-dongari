@@ -6,7 +6,7 @@ import { getColor } from './utils.js';
  * @returns {Promise<Object>}
  */
 export async function fetchGames() {
-    const response = await fetch('data/games.json');
+    const response = await fetch('data/games.json?t=' + Date.now());
     if (!response.ok) {
         throw new Error('games.json을 로드하는 데 실패했습니다.');
     }

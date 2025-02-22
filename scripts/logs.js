@@ -43,7 +43,7 @@ function initializeLogTable(meetings) {
 
         logTableBody.appendChild(tr);
     });
-    
+
 }
 
 
@@ -52,7 +52,7 @@ function initializeLogTable(meetings) {
  * @returns {Promise<Object>}
  */
 export async function fetchMeetings() {
-    const response = await fetch('data/meetings.json');
+    const response = await fetch('data/meetings.json?t=' + Date.now());
     if (!response.ok) {
         throw new Error(`HTTP 에러! 상태: ${response.status}`);
     }

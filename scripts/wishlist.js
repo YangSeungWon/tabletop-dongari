@@ -1,7 +1,7 @@
 import { fetchGameData, fetchGameDetails } from './api.js';
 
 export async function fetchWishlist() {
-    const response = await fetch('data/wishlist.json');
+    const response = await fetch('data/wishlist.json?t=' + Date.now());
     if (!response.ok) {
         throw new Error(`HTTP 에러! 상태: ${response.status}`);
     }
