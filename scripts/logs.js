@@ -30,27 +30,6 @@ function initializeLogTable(meetings) {
         dateTd.textContent = meeting.date;
         tr.appendChild(dateTd);
 
-        // 사진 열
-        const photoTd = document.createElement('td');
-        const photoContainer = document.createElement('div');
-        photoContainer.className = 'photo-container';
-
-        // 날짜에서 하이픈 제거
-        const date = meeting.date.replace(/-/g, '');
-        let foundPhotos = false;
-
-        // 사진 순차적으로 확인
-        checkPhotosSequentially(date, photoContainer)
-            .then(hasPhotos => {
-                if (hasPhotos) {
-                    photoTd.appendChild(photoContainer);
-                } else {
-                    photoTd.textContent = '사진 없음';
-                }
-            });
-
-        tr.appendChild(photoTd);
-
         // 플레이한 게임 열
         const gamesTd = document.createElement('td');
         const gamesList = document.createElement('ul');
@@ -63,6 +42,26 @@ function initializeLogTable(meetings) {
         tr.appendChild(gamesTd);
 
         logTableBody.appendChild(tr);
+
+        // 사진 열
+        const photoTd = document.createElement('td');
+        const photoContainer = document.createElement('div');
+        photoContainer.className = 'photo-container';
+
+        // 날짜에서 하이픈 제거
+        const date = meeting.date.replace(/-/g, '');
+
+        // 사진 순차적으로 확인
+        checkPhotosSequentially(date, photoContainer)
+            .then(hasPhotos => {
+                if (hasPhotos) {
+                    photoTd.appendChild(photoContainer);
+                } else {
+                    photoTd.textContent = '사진 없음';
+                }
+            });
+
+        tr.appendChild(photoTd);
     });
 }
 
