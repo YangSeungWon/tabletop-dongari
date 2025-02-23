@@ -16,7 +16,7 @@ function initializeLogTable(meetings) {
     // 모임 일지가 있는지 확인
     if (meetings.length === 0) {
         const noDataRow = document.createElement('tr');
-        noDataRow.innerHTML = `<td colspan="2">등록된 모임 일지가 없습니다.</td>`;
+        noDataRow.innerHTML = `<td colspan="3">등록된 모임 일지가 없습니다.</td>`;
         logTableBody.appendChild(noDataRow);
         return;
     }
@@ -29,6 +29,27 @@ function initializeLogTable(meetings) {
         const dateTd = document.createElement('td');
         dateTd.textContent = meeting.date;
         tr.appendChild(dateTd);
+
+        // 사진 열
+        const photoTd = document.createElement('td');
+        const photoContainer = document.createElement('div');
+        photoContainer.className = 'photo-container';
+
+        // 날짜에서 하이픈 제거
+        const date = meeting.date.replace(/-/g, '');
+        let foundPhotos = false;
+
+        // 사진 순차적으로 확인
+        checkPhotosSequentially(date, photoContainer)
+            .then(hasPhotos => {
+                if (hasPhotos) {
+                    photoTd.appendChild(photoContainer);
+                } else {
+                    photoTd.textContent = '사진 없음';
+                }
+            });
+
+        tr.appendChild(photoTd);
 
         // 플레이한 게임 열
         const gamesTd = document.createElement('td');
@@ -43,9 +64,69 @@ function initializeLogTable(meetings) {
 
         logTableBody.appendChild(tr);
     });
-
 }
 
+/**
+ * 날짜에 해당하는 사진을 순차적으로 확인합니다.
+ * @param {string} date - YYYYMMDD 형식의 날짜
+ * @param {HTMLElement} container - 사진을 추가할 컨테이너
+ * @returns {Promise<boolean>} 사진이 하나라도 있으면 true
+ */
+async function checkPhotosSequentially(date, container) {
+    let photoIndex = 1;
+    let hasPhotos = false;
+
+    while (true) {
+        const photoUrl = `images/meetings/${date}_${photoIndex}.jpg`;
+        try {
+            const exists = await checkImageExists(photoUrl);
+            if (!exists) break;
+
+            const img = document.createElement('img');
+            img.src = photoUrl;
+            img.alt = `${date} 모임 사진 ${photoIndex}`;
+            img.className = 'meeting-photo';
+
+            // 클릭하면 큰 이미지로 보기
+            img.addEventListener('click', () => {
+                const modal = document.createElement('div');
+                modal.className = 'photo-modal';
+                const modalImg = document.createElement('img');
+                modalImg.src = photoUrl;
+                modal.appendChild(modalImg);
+
+                // 모달 클릭시 닫기
+                modal.addEventListener('click', () => {
+                    modal.remove();
+                });
+
+                document.body.appendChild(modal);
+            });
+
+            container.appendChild(img);
+            hasPhotos = true;
+            photoIndex++;
+        } catch {
+            break;
+        }
+    }
+
+    return hasPhotos;
+}
+
+/**
+ * 이미지 파일이 존재하는지 확인합니다.
+ * @param {string} url - 이미지 URL
+ * @returns {Promise<boolean>}
+ */
+async function checkImageExists(url) {
+    try {
+        const response = await fetch(url, { method: 'HEAD' });
+        return response.ok;
+    } catch {
+        return false;
+    }
+}
 
 /**
  * 모임 일지를 가져옵니다.
