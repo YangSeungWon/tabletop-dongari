@@ -1,43 +1,233 @@
 {
-    "스틱스택": "Stick Stack",
-    "코요테": "Coyote",
-    "두리안": "Durian",
-    "타코 캣 고트 치즈 피자": "Taco Cat Goat Cheese Pizza",
-    "피트": "Pit",
-    "달밤의 베개 싸움": "Night Knight",
-    "윙크": "wink",
-    "3초 트라이!": "3 Second Try",
-    "스위스 사는 스미스씨": "Mr. Smith Living in Swiss",
-    "요호호 해적 고양이": "Ahoy! Kitten",
-    "헤이요": "Hey yo",
-    "셀레스티아": "Celestia",
-    "딕싯": "Dixit",
-    "코드네임": "Codenames",
-    "한밤의 늑대인간": "One Night Ultimate Werewolf",
-    "라스베가스": "Las Vegas",
-    "노터치 크라켄 미니": "No Touch Kraken",
-    "지도 제작자들": "Cartographers",
-    "쇼텐토텐": "Schotten Totten",
-    "쇼텐토텐2": "Schotten Totten 2",
-    "도코종": "Dokojong",
-    "에버델": "Everdell",
-    "캐스캐디아": "Cascadia",
-    "행성X를 찾아서": "The Search for Planet X",
-    "오션스": "Oceans",
-    "기즈모": "Gizmos",
-    "정령섬": "Spirit Island",
-    "더 루프": "The Loop",
-    "아크노바": "Ark Nova",
-    "브라스 버밍엄": "Brass Birmingham",
-    "듄: 임페리움 - 봉기": "Dune Imperium Uprising",
-    "장난꾸러기 호박벌": "Schummel Hummel",
-    "마헤": "Mahe",
-    "카멜업 2판": "Camel Up 2",
-    "스페이스 크루": "The Crew: The Quest for Planet Nine",
-    "도적단의 월급날": "Give Me The Treasure",
-    "독수리 눈치싸움": "What the Heck?",
-    "크베들린부르크의 돌팔이 약장수": "The Quacks of Quedlinburg",
-    "서퍼사우루스 맥스": "Surfosaurus MAX",
-    "스카이 팀": "Sky Team",
-    "용스팬": "Wyrmspan"
+    "games": [
+        {
+            "name": "스틱스택",
+            "englishName": "Stick Stack",
+            "owner": "sw"
+        },
+        {
+            "name": "코요테",
+            "englishName": "Coyote",
+            "owner": "sw"
+        },
+        {
+            "name": "두리안",
+            "englishName": "Durian",
+            "owner": "sw"
+        },
+        {
+            "name": "타코 캣 고트 치즈 피자",
+            "englishName": "Taco Cat Goat Cheese Pizza",
+            "owner": "sw"
+        },
+        {
+            "name": "피트",
+            "englishName": "Pit",
+            "owner": "sw"
+        },
+        {
+            "name": "달밤의 베개 싸움",
+            "englishName": "Night Knight",
+            "owner": "sw"
+        },
+        {
+            "name": "윙크",
+            "englishName": "wink",
+            "owner": "sw"
+        },
+        {
+            "name": "3초 트라이!",
+            "englishName": "3 Second Try",
+            "owner": "sw"
+        },
+        {
+            "name": "스위스 사는 스미스씨",
+            "englishName": "Mr. Smith Living in Swiss",
+            "owner": "sw"
+        },
+        {
+            "name": "요호호 해적 고양이",
+            "englishName": "Ahoy! Kitten",
+            "owner": "sw"
+        },
+        {
+            "name": "헤이요",
+            "englishName": "Hey yo",
+            "owner": "sw"
+        },
+        {
+            "name": "셀레스티아",
+            "englishName": "Celestia",
+            "owner": "sw"
+        },
+        {
+            "name": "딕싯",
+            "englishName": "Dixit",
+            "owner": "sw"
+        },
+        {
+            "name": "코드네임",
+            "englishName": "Codenames",
+            "owner": "sw"
+        },
+        {
+            "name": "한밤의 늑대인간",
+            "englishName": "One Night Ultimate Werewolf",
+            "owner": "sw"
+        },
+        {
+            "name": "라스베가스",
+            "englishName": "Las Vegas",
+            "owner": "sw"
+        },
+        {
+            "name": "노터치 크라켄 미니",
+            "englishName": "No Touch Kraken",
+            "owner": "sw"
+        },
+        {
+            "name": "지도 제작자들",
+            "englishName": "Cartographers",
+            "owner": "sw"
+        },
+        {
+            "name": "쇼텐토텐",
+            "englishName": "Schotten Totten",
+            "owner": "sw"
+        },
+        {
+            "name": "쇼텐토텐2",
+            "englishName": "Schotten Totten 2",
+            "owner": "sw"
+        },
+        {
+            "name": "도코종",
+            "englishName": "Dokojong",
+            "owner": "sw"
+        },
+        {
+            "name": "에버델",
+            "englishName": "Everdell",
+            "owner": "sw"
+        },
+        {
+            "name": "캐스캐디아",
+            "englishName": "Cascadia",
+            "owner": "sw"
+        },
+        {
+            "name": "행성X를 찾아서",
+            "englishName": "The Search for Planet X",
+            "owner": "sw"
+        },
+        {
+            "name": "오션스",
+            "englishName": "Oceans",
+            "owner": "sw"
+        },
+        {
+            "name": "기즈모",
+            "englishName": "Gizmos",
+            "owner": "sw"
+        },
+        {
+            "name": "정령섬",
+            "englishName": "Spirit Island",
+            "owner": "sw"
+        },
+        {
+            "name": "더 루프",
+            "englishName": "The Loop",
+            "owner": "sw"
+        },
+        {
+            "name": "아크노바",
+            "englishName": "Ark Nova",
+            "owner": "sw"
+        },
+        {
+            "name": "브라스 버밍엄",
+            "englishName": "Brass Birmingham",
+            "owner": "sw"
+        },
+        {
+            "name": "듄: 임페리움 - 봉기",
+            "englishName": "Dune Imperium Uprising",
+            "owner": "sw"
+        },
+        {
+            "name": "장난꾸러기 호박벌",
+            "englishName": "Schummel Hummel",
+            "owner": "sw"
+        },
+        {
+            "name": "마헤",
+            "englishName": "Mahe",
+            "owner": "sw"
+        },
+        {
+            "name": "카멜업 2판",
+            "englishName": "Camel Up 2",
+            "owner": "sw"
+        },
+        {
+            "name": "스페이스 크루",
+            "englishName": "The Crew: The Quest for Planet Nine",
+            "owner": "sw"
+        },
+        {
+            "name": "도적단의 월급날",
+            "englishName": "Give Me The Treasure",
+            "owner": "sw"
+        },
+        {
+            "name": "독수리 눈치싸움",
+            "englishName": "What the Heck?",
+            "owner": "sw"
+        },
+        {
+            "name": "크베들린부르크의 돌팔이 약장수",
+            "englishName": "The Quacks of Quedlinburg",
+            "owner": "sw"
+        },
+        {
+            "name": "서퍼사우루스 맥스",
+            "englishName": "Surfosaurus MAX",
+            "owner": "sw"
+        },
+        {
+            "name": "스카이 팀",
+            "englishName": "Sky Team",
+            "owner": "sw"
+        },
+        {
+            "name": "용스팬",
+            "englishName": "Wyrmspan",
+            "owner": "sw"
+        },
+        {
+            "name": "캔버스",
+            "englishName": "Canvas"
+        },
+        {
+            "name": "뱅",
+            "englishName": "Bang!"
+        },
+        {
+            "name": "하나비",
+            "englishName": "Hanabi"
+        },
+        {
+            "name": "바퀴벌레 포커 로얄",
+            "englishName": "Cockroach Poker Royal"
+        },
+        {
+            "name": "달무티",
+            "englishName": "The Great Dalmuti"
+        },
+        {
+            "name": "카탄",
+            "englishName": "Catan"
+        }
+    ]
 }

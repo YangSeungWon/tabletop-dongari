@@ -10,7 +10,13 @@ export async function fetchGames() {
     if (!response.ok) {
         throw new Error('games.json을 로드하는 데 실패했습니다.');
     }
-    return response.json();
+    const data = await response.json();
+    // Convert the new structure to the old format for backward compatibility
+    const nameMapping = {};
+    data.games.forEach(game => {
+        nameMapping[game.name] = game.englishName;
+    });
+    return nameMapping;
 }
 
 /**
@@ -129,7 +135,20 @@ export async function fetchGameData(koreanName, englishName, linkElement) {
                 linkElement.setAttribute('bggId', id);
 
                 // 상세 게임 데이터 가져오기 (캐싱 적용)
-                return fetchGameDetails(id, linkElement);
+                return fetchGameDetails(id, linkElement)
+                    .then(([rating, weight]) => {
+                        // weight가 비어있거나 0.0인 경우 다음 게임 시도
+                        if (!weight || weight === '0.00' || weight === '0.0' || weight === '0') {
+                            console.log(`게임 weight가 비어있거나 0.0입니다: ${englishName}, 다음 게임을 시도합니다.`);
+
+                            // 이미 시도한 게임 ID들을 추적
+                            const triedIds = new Set([id]);
+
+                            // 재귀적으로 다음 게임 시도
+                            return tryNextGame(items, linkElement, triedIds, englishName, koreanName);
+                        }
+                        return [rating, weight];
+                    });
             } else {
                 console.warn(`게임을 찾을 수 없습니다: ${englishName}`);
                 console.warn(`${koreanName} 게임의 영어이름이 제대로 설정되지 않았습니다. 새탭으로 보드라이프 검색 페이지를 엽니다.`);
@@ -237,5 +256,46 @@ export async function fetchGameDetails(gameId, linkElement) {
             linkElement.parentElement.parentElement.querySelector('.score').textContent = 'Error';
             linkElement.parentElement.parentElement.querySelector('.weight').textContent = 'Error';
             return Promise.reject('Error');
+        });
+}
+
+/**
+ * 다음 게임을 시도합니다.
+ * @param {NodeList} items - 검색된 게임 목록
+ * @param {HTMLElement} linkElement - 링크 요소
+ * @param {Set} triedIds - 이미 시도한 게임 ID들
+ * @param {string} englishName - 영어 게임 이름
+ * @param {string} koreanName - 한국어 게임 이름
+ * @param {number} maxAttempts - 최대 시도 횟수 (기본값: 5)
+ * @returns {Promise<Array<string | number>>}
+ */
+async function tryNextGame(items, linkElement, triedIds, englishName, koreanName, maxAttempts = 5) {
+    if (triedIds.size >= maxAttempts) {
+        console.warn(`최대 시도 횟수(${maxAttempts})에 도달했습니다. 게임: ${englishName}`);
+        linkElement.parentElement.parentElement.querySelector('.score').textContent = 'N/A';
+        linkElement.parentElement.parentElement.querySelector('.weight').textContent = 'N/A';
+        return ['N/A', 'N/A'];
+    }
+
+    const nextItem = Array.from(items).find(item => !triedIds.has(item.getAttribute('id')));
+    if (!nextItem) {
+        console.warn(`더 이상 시도할 게임이 없습니다: ${englishName}`);
+        linkElement.parentElement.parentElement.querySelector('.score').textContent = 'N/A';
+        linkElement.parentElement.parentElement.querySelector('.weight').textContent = 'N/A';
+        return ['N/A', 'N/A'];
+    }
+
+    const nextId = nextItem.getAttribute('id');
+    triedIds.add(nextId);
+    linkElement.href = `https://boardgamegeek.com/boardgame/${nextId}`;
+    linkElement.setAttribute('bggId', nextId);
+
+    return fetchGameDetails(nextId, linkElement)
+        .then(([rating, weight]) => {
+            if (!weight || weight === '0.00' || weight === '0.0' || weight === '0') {
+                console.log(`게임 weight가 비어있거나 0.0입니다: ${englishName}, 다음 게임을 시도합니다. (시도 ${triedIds.size}/${maxAttempts})`);
+                return tryNextGame(items, linkElement, triedIds, englishName, koreanName, maxAttempts);
+            }
+            return [rating, weight];
         });
 }
