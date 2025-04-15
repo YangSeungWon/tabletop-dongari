@@ -143,6 +143,8 @@ function initializeRecentPlayed() {
  * 이벤트 리스너들을 초기화합니다.
  */
 export function initializeEventListeners() {
+    console.log('이벤트 리스너 초기화 시작');
+
     const scoreSortButton = document.getElementById('score-sort-button');
     const weightSortButton = document.getElementById('weight-sort-button');
     const resetButton = document.getElementById('reset-button');
@@ -152,46 +154,102 @@ export function initializeEventListeners() {
     const dateSortButton = document.getElementById('date-sort-button');
     const filterLevelSlider = document.getElementById('filter-level');
 
+    // 버튼 존재 여부 확인
+    console.log('버튼 존재 여부 확인:');
+    console.log('- scoreSortButton:', scoreSortButton ? '존재' : '없음');
+    console.log('- weightSortButton:', weightSortButton ? '존재' : '없음');
+    console.log('- nameSortButton:', nameSortButton ? '존재' : '없음');
+    console.log('- playtimeSortButton:', playtimeSortButton ? '존재' : '없음');
+    console.log('- dateSortButton:', dateSortButton ? '존재' : '없음');
+    console.log('- resetButton:', resetButton ? '존재' : '없음');
+    console.log('- filterLevelSlider:', filterLevelSlider ? '존재' : '없음');
+
     // Initialize slider appearance
-    updateSliderAppearance(0);
+    if (filterLevelSlider) {
+        updateSliderAppearance(0);
+    }
 
     // 정렬 버튼 이벤트 리스너
-    scoreSortButton.addEventListener('click', () => {
-        console.log('스코어 기준 정렬 버튼 클릭됨.');
-        sortGamesByScore();
-    });
-    weightSortButton.addEventListener('click', () => {
-        console.log('난이도 기준 정렬 버튼 클릭됨.');
-        sortGamesByWeight();
-    });
+    if (scoreSortButton) {
+        scoreSortButton.addEventListener('click', () => {
+            console.log('스코어 기준 정렬 버튼 클릭됨.');
+            console.log('버튼 상태:', {
+                classList: Array.from(scoreSortButton.classList),
+                textContent: scoreSortButton.textContent
+            });
+            sortGamesByScore();
+        });
+    }
+
+    if (weightSortButton) {
+        weightSortButton.addEventListener('click', () => {
+            console.log('난이도 기준 정렬 버튼 클릭됨.');
+            console.log('버튼 상태:', {
+                classList: Array.from(weightSortButton.classList),
+                textContent: weightSortButton.textContent
+            });
+            sortGamesByWeight();
+        });
+    }
 
     // 필터 기능 이벤트 리스너
-    playerCountInput.addEventListener('input', handlePlayerCountInput);
-    filterLevelSlider.addEventListener('input', handlePlayerCountInput);
+    if (playerCountInput) {
+        playerCountInput.addEventListener('input', handlePlayerCountInput);
+    }
+
+    if (filterLevelSlider) {
+        filterLevelSlider.addEventListener('input', handlePlayerCountInput);
+    }
 
     // 슬라이더 스텝 이동을 위한 레이블 클릭 이벤트
     document.querySelectorAll('.filter-label').forEach((label, index) => {
         label.addEventListener('click', () => {
-            filterLevelSlider.value = index;
-            handlePlayerCountInput();
+            if (filterLevelSlider) {
+                filterLevelSlider.value = index;
+                handlePlayerCountInput();
+            }
         });
     });
 
-    resetButton.addEventListener('click', handleReset);
+    if (resetButton) {
+        resetButton.addEventListener('click', handleReset);
+    }
 
     // 추가 정렬 버튼 이벤트 리스너
-    nameSortButton.addEventListener('click', () => {
-        console.log('게임 이름 기준 정렬 버튼 클릭됨.');
-        sortGamesByName();
-    });
-    playtimeSortButton.addEventListener('click', () => {
-        console.log('플레이 시간 기준 정렬 버튼 클릭됨.');
-        sortGamesByPlaytime();
-    });
-    dateSortButton.addEventListener('click', () => {
-        console.log('최근 플레이 날짜 기준 정렬 버튼 클릭됨.');
-        sortGamesByDate();
-    });
+    if (nameSortButton) {
+        nameSortButton.addEventListener('click', () => {
+            console.log('게임 이름 기준 정렬 버튼 클릭됨.');
+            console.log('버튼 상태:', {
+                classList: Array.from(nameSortButton.classList),
+                textContent: nameSortButton.textContent
+            });
+            sortGamesByName();
+        });
+    }
+
+    if (playtimeSortButton) {
+        playtimeSortButton.addEventListener('click', () => {
+            console.log('플레이 시간 기준 정렬 버튼 클릭됨.');
+            console.log('버튼 상태:', {
+                classList: Array.from(playtimeSortButton.classList),
+                textContent: playtimeSortButton.textContent
+            });
+            sortGamesByPlaytime();
+        });
+    }
+
+    if (dateSortButton) {
+        dateSortButton.addEventListener('click', () => {
+            console.log('최근 플레이 날짜 기준 정렬 버튼 클릭됨.');
+            console.log('버튼 상태:', {
+                classList: Array.from(dateSortButton.classList),
+                textContent: dateSortButton.textContent
+            });
+            sortGamesByDate();
+        });
+    }
+
+    console.log('이벤트 리스너 초기화 완료');
 }
 
 /**
@@ -360,115 +418,119 @@ function handleReset() {
 }
 
 /**
- * 게임을 소트하는 일반 함수
- * @param {HTMLElement} sortButton - 소트 버튼
- * @param {string} selector - 소트 기준 셀렉터
- * @param {string|null} forceTo - 강제 정렬 방향 ('asc' 또는 'desc')
+ * 게임을 정렬합니다.
+ * @param {HTMLElement} sortButton - 정렬 버튼
+ * @param {string} selector - 정렬할 열의 선택자
+ * @param {string} forceTo - 강제 정렬 방향 (asc 또는 desc)
  */
 function sortGames(sortButton, selector, forceTo = null) {
-    const order = forceTo ? forceTo : sortButton.classList.contains('desc') ? 'asc' : 'desc';
-    const previousOrder = sortButton.classList.contains('desc') ? 'desc' : 'asc';
-    const switchOrder = previousOrder !== order;
-    const gameLists = document.getElementById('game-list');
+    const gameList = document.getElementById('game-list');
+    const games = Array.from(gameList.querySelectorAll('tr'));
+    const isDesc = forceTo === 'desc' || (forceTo === null && sortButton.classList.contains('desc'));
 
-    console.log('sortGames', sortButton, selector, order, previousOrder, switchOrder);
+    // 다른 정렬 버튼들의 selected 클래스 제거
+    document.querySelectorAll('.sort-button').forEach(button => {
+        button.classList.remove('selected');
+    });
 
-    const items = Array.from(gameLists.querySelectorAll('tr'));
+    // 현재 선택된 정렬 버튼에 selected 클래스 추가
+    sortButton.classList.add('selected');
 
-    items.sort((a, b) => {
-        let comparison = 0;
-        if (selector === '.playtime') {
-            const timeA = parsePlaytime(a.querySelector(selector).textContent.trim());
-            const timeB = parsePlaytime(b.querySelector(selector).textContent.trim());
-            comparison = order === 'desc' ? timeB - timeA : timeA - timeB;
-        } else if (selector === 'td:first-child') {
-            const textA = a.querySelector(selector).textContent.trim();
-            const textB = b.querySelector(selector).textContent.trim();
-            comparison = order === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
-        } else if (selector === '.last-played') {
-            const textA = a.querySelector(selector).textContent.trim();
-            const textB = b.querySelector(selector).textContent.trim();
-            comparison = order === 'desc' ? textB.localeCompare(textA) : textA.localeCompare(textB);
-        } else {
-            const textA = a.querySelector(selector).textContent.trim();
-            const textB = b.querySelector(selector).textContent.trim();
-            comparison = order === 'desc' ? parseFloat(textB) - parseFloat(textA) : parseFloat(textA) - parseFloat(textB);
+    // 정렬 방향 토글
+    if (forceTo === null) {
+        sortButton.classList.toggle('desc');
+    }
+
+    // 버튼 텍스트 업데이트
+    if (selector === '.score') {
+        sortButton.textContent = isDesc ? '10 ▶︎ 1' : '1 ▶︎ 10';
+    } else if (selector === '.weight') {
+        sortButton.textContent = isDesc ? '5 ▶︎ 1' : '1 ▶︎ 5';
+    } else if (selector === 'td:first-child') {
+        sortButton.textContent = isDesc ? 'Z ▶︎ A' : 'A ▶︎ Z';
+    } else if (selector === '.playtime') {
+        sortButton.textContent = isDesc ? 'L ▶︎ S' : 'S ▶︎ L';
+    } else if (selector === '.last-played') {
+        sortButton.textContent = isDesc ? 'R ▶︎ X' : 'X ▶︎ R';
+    }
+
+    // 버튼 클래스 업데이트
+    if (isDesc) {
+        sortButton.classList.add('worse-gradient');
+        sortButton.classList.remove('better-gradient');
+    } else {
+        sortButton.classList.add('better-gradient');
+        sortButton.classList.remove('worse-gradient');
+    }
+
+    // 정렬 실행
+    games.sort((a, b) => {
+        const aValue = a.querySelector(selector).textContent;
+        const bValue = b.querySelector(selector).textContent;
+
+        // 숫자로 변환 가능한 경우 숫자로 비교
+        const aNum = parseFloat(aValue);
+        const bNum = parseFloat(bValue);
+        if (!isNaN(aNum) && !isNaN(bNum)) {
+            return isDesc ? bNum - aNum : aNum - bNum;
         }
 
-        if (comparison !== 0) return comparison;
+        // 날짜 형식인 경우
+        if (selector === '.last-played') {
+            const aDate = aValue ? new Date(aValue.replace(/-/g, '/')) : new Date(0);
+            const bDate = bValue ? new Date(bValue.replace(/-/g, '/')) : new Date(0);
+            return isDesc ? bDate - aDate : aDate - bDate;
+        }
 
-        // 보조 정렬 기준: 초기 순서
-        const aOrder = parseInt(a.getAttribute('data-order'), 10);
-        const bOrder = parseInt(b.getAttribute('data-order'), 10);
-        return aOrder - bOrder;
+        // 문자열인 경우
+        return isDesc ? bValue.localeCompare(aValue) : aValue.localeCompare(bValue);
     });
-    // 정렬된 항목 다시 추가
-    items.forEach(item => gameLists.appendChild(item));
 
-    // 버튼 스타일 및 애니메이션 처리
-    const recentlySortedButtons = document.getElementsByClassName('recently-sorted');
-    for (const recentlySortedButton of recentlySortedButtons) {
-        recentlySortedButton.classList.remove('recently-sorted');
-    }
-    sortButton.classList.add('recently-sorted');
-
-    if (switchOrder) {
-        sortButton.classList.toggle('better-gradient');
-        sortButton.classList.toggle('worse-gradient');
-        sortButton.classList.toggle('desc');
-
-        const [a, b] = sortButton.textContent.split('▶︎').map(s => s.trim());
-        sortButton.textContent = `${b} ▶︎ ${a}`;
-    }
-
-    // 애니메이션 추가
-    gameLists.classList.add('sorting');
-    setTimeout(() => {
-        gameLists.classList.remove('sorting');
-    }, 500);
+    // 정렬된 순서로 테이블 업데이트
+    games.forEach(game => gameList.appendChild(game));
 }
 
 /**
- * 스코어 기준으로 게임을 소트합니다.
- * @param {string|null} forceTo - 강제 정렬 방향 ('asc' 또는 'desc')
+ * 게임을 평점 기준으로 정렬합니다.
+ * @param {string} forceTo - 강제 정렬 방향 (asc 또는 desc)
  */
 export function sortGamesByScore(forceTo = null) {
-    const scoreSortButton = document.getElementById('score-sort-button');
-    sortGames(scoreSortButton, '.score', forceTo);
+    const sortButton = document.getElementById('score-sort-button');
+    sortGames(sortButton, '.score', forceTo);
 }
 
 /**
- * 난이도 기준으로 게임을 소트합니다.
- * @param {string|null} forceTo - 강제 정렬 방향 ('asc' 또는 'desc')
+ * 게임을 난이도 기준으로 정렬합니다.
+ * @param {string} forceTo - 강제 정렬 방향 (asc 또는 desc)
  */
 export function sortGamesByWeight(forceTo = null) {
-    const weightSortButton = document.getElementById('weight-sort-button');
-    sortGames(weightSortButton, '.weight', forceTo);
+    const sortButton = document.getElementById('weight-sort-button');
+    sortGames(sortButton, '.weight', forceTo);
 }
 
 /**
- * 게임 이름 기준으로 게임을 소트합니다.
- * @param {string|null} forceTo - 강제 정렬 방향 ('asc' 또는 'desc')
+ * 게임을 이름 기준으로 정렬합니다.
+ * @param {string} forceTo - 강제 정렬 방향 (asc 또는 desc)
  */
 export function sortGamesByName(forceTo = null) {
-    const nameSortButton = document.getElementById('name-sort-button');
-    sortGames(nameSortButton, 'td:first-child', forceTo);
+    const sortButton = document.getElementById('name-sort-button');
+    sortGames(sortButton, 'td:first-child', forceTo);
 }
 
 /**
- * 플레이 시간 기준으로 게임을 소트합니다.
- * @param {string|null} forceTo - 강제 정렬 방향 ('asc' 또는 'desc')
+ * 게임을 플레이 시간 기준으로 정렬합니다.
+ * @param {string} forceTo - 강제 정렬 방향 (asc 또는 desc)
  */
 export function sortGamesByPlaytime(forceTo = null) {
-    const playtimeSortButton = document.getElementById('playtime-sort-button');
-    sortGames(playtimeSortButton, '.playtime', forceTo);
+    const sortButton = document.getElementById('playtime-sort-button');
+    sortGames(sortButton, '.playtime', forceTo);
 }
 
 /**
- * 최근 플레이 날짜 기준으로 게임을 소트합니다.
- * @param {string|null} forceTo - 강제 정렬 방향 ('asc' 또는 'desc')
+ * 게임을 최근 플레이 날짜 기준으로 정렬합니다.
+ * @param {string} forceTo - 강제 정렬 방향 (asc 또는 desc)
  */
 export function sortGamesByDate(forceTo = null) {
-    const dateSortButton = document.getElementById('date-sort-button');
-    sortGames(dateSortButton, '.last-played', forceTo);
+    const sortButton = document.getElementById('date-sort-button');
+    sortGames(sortButton, '.last-played', forceTo);
 } 

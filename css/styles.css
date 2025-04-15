@@ -82,6 +82,15 @@ footer {
   border: 3px solid #d9ff00;
 }
 
+.sort-button.selected {
+  border: 3px solid #d9ff00;
+}
+
+.sort-button.selected:hover {
+  filter: brightness(0.9);
+  border: 3px solid #b6d600;
+}
+
 .better-gradient {
   background-image: linear-gradient(to right, #770000, #007700);
 }
