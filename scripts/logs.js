@@ -12,8 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function initializeLogTable(meetings) {
     const logTableBody = document.querySelector('#log-table tbody');
+    logTableBody.innerHTML = ''; // 기존 테이블 내용 초기화
 
-    // 모임 일지가 있는지 확인
+    // 모임 일지를 날짜 기준으로 내림차순 정렬 (최근이 먼저)
+    meetings.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // 모임 일지가 없는 경우
     if (meetings.length === 0) {
         const noDataRow = document.createElement('tr');
         noDataRow.innerHTML = `<td colspan="3">등록된 모임 일지가 없습니다.</td>`;
@@ -41,17 +45,12 @@ function initializeLogTable(meetings) {
         gamesTd.appendChild(gamesList);
         tr.appendChild(gamesTd);
 
-        logTableBody.appendChild(tr);
-
         // 사진 열
         const photoTd = document.createElement('td');
         const photoContainer = document.createElement('div');
         photoContainer.className = 'photo-container';
 
-        // 날짜에서 하이픈 제거
         const date = meeting.date.replace(/-/g, '');
-
-        // 사진 순차적으로 확인
         checkPhotosSequentially(date, photoContainer)
             .then(hasPhotos => {
                 if (hasPhotos) {
@@ -62,6 +61,9 @@ function initializeLogTable(meetings) {
             });
 
         tr.appendChild(photoTd);
+
+        // 모든 열을 다 만든 뒤에 tr을 테이블에 추가
+        logTableBody.appendChild(tr);
     });
 }
 
