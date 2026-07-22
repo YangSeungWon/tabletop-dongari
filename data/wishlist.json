@@ -1,6 +1,18 @@
 {
     "세티": {
         "englishName": "SETI: Search for Extraterrestrial Intelligence",
-        "reason": "한글판 발매 예정 - 보드피아"
+        "reason": "한글판 발매 예정 - 보드피아",
+        "stats": {
+            "bggId": "418059",
+            "rating": "8.41",
+            "weight": "3.83",
+            "minPlayers": 1,
+            "maxPlayers": 4,
+            "minPlaytime": 40,
+            "maxPlaytime": 160,
+            "bestWith": "3",
+            "recommendedWith": "N/A",
+            "updatedAt": "2026-07-22"
+        }
     }
 }
