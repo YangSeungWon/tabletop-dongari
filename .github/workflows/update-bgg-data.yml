@@ -1,0 +1,58 @@
+name: Update BGG data
+
+# BGG 통계를 서버측에서 가져와 data/*.json 에 캐시한다.
+# 브라우저에서 직접 BGG를 호출하지 않기 위함 (CORS/401/레이트리밋 회피).
+on:
+  workflow_dispatch:        # 수동 실행
+    inputs:
+      only_missing:
+        description: '이미 채워진 게임은 건너뛰기 (신규만 채움)'
+        type: boolean
+        default: false
+  push:                     # 게임 목록이 바뀌면 신규만 자동으로 채움
+    branches: [main]
+    paths:
+      - data/games.json
+      - data/wishlist.json
+  schedule:
+    - cron: '0 18 1 * *'    # 매월 1일 18:00 UTC (KST 2일 03:00)
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-bgg-data
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Fetch BGG stats
+        env:
+          BGG_TOKEN: ${{ secrets.BGG_TOKEN }}
+        # push(게임 추가)와 수동+only_missing 이면 신규만, 그 외(월간/수동 전체)엔 전부 갱신
+        run: |
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.only_missing }}" = "true" ]; then
+            node scripts/build/fetch-bgg.mjs --only-missing
+          else
+            node scripts/build/fetch-bgg.mjs
+          fi
+
+      - name: Commit updated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- data/; then
+            echo "변경 사항 없음"
+          else
+            git add data/games.json data/wishlist.json
+            git commit -m "chore: BGG 통계 자동 갱신"
+            git push
+          fi

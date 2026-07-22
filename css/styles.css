@@ -505,3 +505,20 @@ nav .button:hover {
   max-height: 90%;
   object-fit: contain;
 }
+
+/* BGG 데이터 출처 표기 (API 약관: Powered by BGG 로고 필수) */
+footer.bgg-attribution {
+  position: static;
+  background: none;
+  color: #7f8c8d;
+  font-size: 12px;
+  padding: 24px 12px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+footer.bgg-attribution img {
+  vertical-align: middle;
+}

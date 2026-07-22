@@ -1,4 +1,4 @@
-import { fetchGameData, fetchGameDetails } from './api.js';
+import { applyStats } from './api.js';
 
 export async function fetchWishlist() {
     const response = await fetch('data/wishlist.json?t=' + Date.now());
@@ -34,16 +34,8 @@ async function loadWishlistItems() {
             `;
             wishlistItems.appendChild(tr);
 
-            const link = tr.querySelector('.bgg-link');
-            try {
-                if (gameData.englishName && typeof gameData.englishName === 'string') {
-                    await fetchGameData(koreanName, gameData.englishName, link);
-                } else {
-                    console.warn(`영어 이름이 없습니다: ${koreanName}`);
-                }
-            } catch (error) {
-                console.error(`게임 데이터 로드 중 에러 (${koreanName}):`, error);
-            }
+            // BGG를 실시간 호출하지 않고, 미리 캐시된 stats를 렌더한다.
+            applyStats(tr.querySelector('.bgg-link'), gameData.stats);
         }
     } catch (error) {
         console.error('위시리스트 로드 중 에러:', error);

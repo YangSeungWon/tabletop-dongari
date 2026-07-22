@@ -1,4 +1,4 @@
-import { fetchGameData, fetchGameDetails, openPostWindow } from './api.js';
+import { applyStats } from './api.js';
 import { parsePlaytime, checkPlayerCount } from './utils.js';
 import { fetchMeetings } from './logs.js';
 
@@ -41,15 +41,15 @@ export function initializeGameList(nameMapping) {
         .then(response => response.json())
         .then(data => {
             data.games.forEach(game => {
+                // 이름에 "이름|id" 형태가 있으면 표시용 이름만 분리
                 let processedKoreanName = game.name;
-                let bggId = null;
                 if (game.name.includes('|')) {
-                    [processedKoreanName, bggId] = game.name.split('|');
+                    [processedKoreanName] = game.name.split('|');
                 }
                 const tr = document.createElement('tr');
                 tr.setAttribute('data-order', initialOrder++); // 초기 순서 저장
                 tr.innerHTML = `
-                    <td><a href="#" target="_blank" class="bgg-link" englishName="${game.englishName}" ${bggId ? `bggId="${bggId}"` : ''}>
+                    <td><a href="#" target="_blank" class="bgg-link" englishName="${game.englishName}">
                         ${processedKoreanName}
                     </a></td>
                     <td class="score">...</td>
@@ -62,54 +62,24 @@ export function initializeGameList(nameMapping) {
                     <td class="owner">${game.owner || '공용'}</td>
                 `;
                 gameList.appendChild(tr);
+
+                // BGG를 실시간 호출하지 않고, 미리 캐시된 stats를 그대로 렌더한다.
+                applyStats(tr.querySelector('.bgg-link'), game.stats);
             });
 
             // 필터 레벨 슬라이더 생성
             createFilterLevelSlider();
-
-            const links = document.querySelectorAll('.bgg-link');
-            const promises = Array.from(links).map(async link => {
-                const koreanName = link.textContent.trim();
-                const englishName = link.getAttribute('englishName');
-                const bggId = link.getAttribute('bggId');
-                if (bggId != null) {
-                    const gameUrl = `https://boardgamegeek.com/boardgame/${bggId}`;
-                    link.href = gameUrl;
-
-                    // 상세 게임 데이터 가져오기
-                    await fetchGameDetails(bggId, link);
-                    return;
-                }
-
-                if (englishName) {
-                    await fetchGameData(koreanName, englishName, link);
-                } else {
-                    console.warn(`영어 이름을 찾을 수 없습니다: ${koreanName}`);
-                    // 영어 이름이 없는 경우 보드라이프 검색 페이지로 이동
-                    const boardlifeUrl = `https://boardlife.co.kr/search_ajax.php`;
-                    const boardlifeData = {
-                        action: "CallPage",
-                        query: koreanName,
-                        page: "game"
-                    };
-                    openPostWindow(boardlifeUrl, boardlifeData);
-                }
-            });
 
             const playerCountInput = document.getElementById('player-count');
             playerCountInput.value = '';
 
             initializeRecentPlayed();
 
-            Promise.all(promises).then(() => {
-                console.log('모든 게임 데이터를 성공적으로 로드했습니다.');
+            console.log('모든 게임 데이터를 성공적으로 로드했습니다.');
 
-                // 초기 상태는 난이도 기준 오름차순 정렬
-                sortGamesByScore('desc');
-                sortGamesByWeight('asc');
-            }).catch(error => {
-                console.error('게임 데이터 로드 중 에러 발생:', error);
-            });
+            // 초기 상태는 평점/난이도 기준 정렬
+            sortGamesByScore('desc');
+            sortGamesByWeight('asc');
         })
         .catch(error => {
             console.error('games.json 로드 중 에러 발생:', error);
