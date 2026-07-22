@@ -139,7 +139,8 @@ function parseThing(xml) {
     if (pollMatch) {
         const poll = pollMatch[1];
         const best = poll.match(/<result\b[^>]*name="bestwith"[^>]*value="([^"]*)"/);
-        const rec = poll.match(/<result\b[^>]*name="recomm?endedwith"[^>]*value="([^"]*)"/);
+        // BGG는 이 필드에 오타("recommmendedwith", m 3개)를 쓰기도 하므로 m 1~3개 모두 허용
+        const rec = poll.match(/<result\b[^>]*name="recom+endedwith"[^>]*value="([^"]*)"/);
         if (best) {
             try {
                 bestWith = decodeEntities(best[1]).split('with ')[1].split(' players')[0];
