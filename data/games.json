@@ -6,7 +6,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "204734",
-                "rating": "6.51",
+                "rating": "6.50",
                 "weight": "1.00",
                 "minPlayers": 2,
                 "maxPlayers": 99,
@@ -14,7 +14,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "6",
                 "recommendedWith": "3–15",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -23,7 +23,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "443688",
-                "rating": "6.45",
+                "rating": "6.47",
                 "weight": "1.50",
                 "minPlayers": 3,
                 "maxPlayers": 8,
@@ -31,7 +31,7 @@
                 "maxPlaytime": 10,
                 "bestWith": "4",
                 "recommendedWith": "3–8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -48,7 +48,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "5–7",
                 "recommendedWith": "4–7",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -57,7 +57,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "253664",
-                "rating": "6.46",
+                "rating": "6.45",
                 "weight": "1.03",
                 "minPlayers": 2,
                 "maxPlayers": 8,
@@ -65,7 +65,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "4–6",
                 "recommendedWith": "3–8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -82,7 +82,7 @@
                 "maxPlaytime": 90,
                 "bestWith": "6–8",
                 "recommendedWith": "4–8+",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -91,7 +91,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "403151",
-                "rating": "6.12",
+                "rating": "6.11",
                 "weight": "1.00",
                 "minPlayers": 3,
                 "maxPlayers": 6,
@@ -99,7 +99,7 @@
                 "maxPlaytime": 15,
                 "bestWith": "N/A",
                 "recommendedWith": "N/A",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -116,7 +116,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "6",
                 "recommendedWith": "5–8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -125,15 +125,15 @@
             "owner": "sw",
             "stats": {
                 "bggId": "355473",
-                "rating": "6.39",
+                "rating": "6.41",
                 "weight": "1.00",
                 "minPlayers": 2,
                 "maxPlayers": 7,
                 "minPlaytime": 15,
                 "maxPlaytime": 15,
-                "bestWith": "5",
-                "recommendedWith": "5–7",
-                "updatedAt": "2026-09-01"
+                "bestWith": "5–7",
+                "recommendedWith": "3–7+",
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -150,7 +150,7 @@
                 "maxPlaytime": 15,
                 "bestWith": "N/A",
                 "recommendedWith": "N/A",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -159,7 +159,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "367344",
-                "rating": "6.86",
+                "rating": "6.87",
                 "weight": "1.00",
                 "minPlayers": 2,
                 "maxPlayers": 6,
@@ -167,7 +167,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "4",
                 "recommendedWith": "3–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -184,7 +184,7 @@
                 "maxPlaytime": 15,
                 "bestWith": "6",
                 "recommendedWith": "3–6, 8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -201,7 +201,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "5–6",
                 "recommendedWith": "3–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -218,7 +218,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "5–6",
                 "recommendedWith": "4–6+",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -235,7 +235,7 @@
                 "maxPlaytime": 15,
                 "bestWith": "6, 8",
                 "recommendedWith": "4–8+",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -252,7 +252,7 @@
                 "maxPlaytime": 10,
                 "bestWith": "6–8",
                 "recommendedWith": "4–10",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -261,15 +261,15 @@
             "owner": "sw",
             "stats": {
                 "bggId": "463783",
-                "rating": "7.51",
-                "weight": "1.18",
+                "rating": "7.48",
+                "weight": "1.15",
                 "minPlayers": 2,
                 "maxPlayers": 6,
                 "minPlaytime": 40,
                 "maxPlaytime": 40,
-                "bestWith": "4–5",
+                "bestWith": "5–6",
                 "recommendedWith": "3–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -286,7 +286,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "6",
                 "recommendedWith": "4–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -303,7 +303,7 @@
                 "maxPlaytime": 45,
                 "bestWith": "3–4",
                 "recommendedWith": "1–8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -320,7 +320,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "2",
                 "recommendedWith": "2",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -329,7 +329,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "300930",
-                "rating": "7.06",
+                "rating": "7.05",
                 "weight": "1.96",
                 "minPlayers": 2,
                 "maxPlayers": 2,
@@ -337,7 +337,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "2",
                 "recommendedWith": "2",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -346,7 +346,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "330401",
-                "rating": "6.37",
+                "rating": "6.38",
                 "weight": "1.50",
                 "minPlayers": 2,
                 "maxPlayers": 5,
@@ -354,7 +354,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "3",
                 "recommendedWith": "2–5",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -364,14 +364,14 @@
             "stats": {
                 "bggId": "199792",
                 "rating": "7.97",
-                "weight": "2.83",
+                "weight": "2.84",
                 "minPlayers": 1,
                 "maxPlayers": 4,
                 "minPlaytime": 40,
                 "maxPlaytime": 80,
                 "bestWith": "3",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -388,7 +388,7 @@
                 "maxPlaytime": 45,
                 "bestWith": "2–3",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -405,7 +405,7 @@
                 "maxPlaytime": 75,
                 "bestWith": "2–3",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -422,7 +422,7 @@
                 "maxPlaytime": 90,
                 "bestWith": "3",
                 "recommendedWith": "2–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -439,7 +439,7 @@
                 "maxPlaytime": 50,
                 "bestWith": "3",
                 "recommendedWith": "2–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -456,7 +456,7 @@
                 "maxPlaytime": 120,
                 "bestWith": "2",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -473,7 +473,7 @@
                 "maxPlaytime": 60,
                 "bestWith": "2",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -490,7 +490,7 @@
                 "maxPlaytime": 150,
                 "bestWith": "2",
                 "recommendedWith": "1–3",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -507,7 +507,7 @@
                 "maxPlaytime": 120,
                 "bestWith": "3–4",
                 "recommendedWith": "2–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -524,7 +524,7 @@
                 "maxPlaytime": 120,
                 "bestWith": "4",
                 "recommendedWith": "1–4, 6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -533,7 +533,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "235944",
-                "rating": "6.46",
+                "rating": "6.47",
                 "weight": "1.24",
                 "minPlayers": 3,
                 "maxPlayers": 5,
@@ -541,7 +541,7 @@
                 "maxPlaytime": 25,
                 "bestWith": "4–5",
                 "recommendedWith": "3–5+",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -558,7 +558,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "5–7",
                 "recommendedWith": "3–7",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -575,7 +575,7 @@
                 "maxPlaytime": 45,
                 "bestWith": "5–6",
                 "recommendedWith": "3–8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -592,7 +592,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "4",
                 "recommendedWith": "3–5",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -601,7 +601,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "391761",
-                "rating": "6.82",
+                "rating": "6.83",
                 "weight": "1.50",
                 "minPlayers": 2,
                 "maxPlayers": 4,
@@ -609,7 +609,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "2, 4",
                 "recommendedWith": "2–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -626,7 +626,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "5",
                 "recommendedWith": "3–5",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -643,7 +643,7 @@
                 "maxPlaytime": 45,
                 "bestWith": "4",
                 "recommendedWith": "2–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -653,14 +653,14 @@
             "stats": {
                 "bggId": "394887",
                 "rating": "6.91",
-                "weight": "1.20",
+                "weight": "1.23",
                 "minPlayers": 2,
                 "maxPlayers": 6,
                 "minPlaytime": 20,
                 "maxPlaytime": 20,
                 "bestWith": "3",
                 "recommendedWith": "3–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -677,7 +677,7 @@
                 "maxPlaytime": 20,
                 "bestWith": "2",
                 "recommendedWith": "2",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -694,7 +694,7 @@
                 "maxPlaytime": 90,
                 "bestWith": "3",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -711,7 +711,7 @@
                 "maxPlaytime": 70,
                 "bestWith": "3",
                 "recommendedWith": "1–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -728,7 +728,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "4–5",
                 "recommendedWith": "3–5",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -745,7 +745,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "4–5",
                 "recommendedWith": "3–7",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -761,7 +761,7 @@
                 "maxPlaytime": 30,
                 "bestWith": "3–4",
                 "recommendedWith": "1–5",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -777,7 +777,7 @@
                 "maxPlaytime": 40,
                 "bestWith": "7",
                 "recommendedWith": "5–7",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -793,7 +793,7 @@
                 "maxPlaytime": 25,
                 "bestWith": "4",
                 "recommendedWith": "2–5",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -809,7 +809,7 @@
                 "maxPlaytime": 25,
                 "bestWith": "4–5",
                 "recommendedWith": "3–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -825,7 +825,7 @@
                 "maxPlaytime": 60,
                 "bestWith": "6–7",
                 "recommendedWith": "5–8",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -841,7 +841,7 @@
                 "maxPlaytime": 120,
                 "bestWith": "4",
                 "recommendedWith": "3–4",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -850,7 +850,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "131357",
-                "rating": "6.98",
+                "rating": "6.97",
                 "weight": "1.41",
                 "minPlayers": 2,
                 "maxPlayers": 6,
@@ -858,7 +858,7 @@
                 "maxPlaytime": 15,
                 "bestWith": "5",
                 "recommendedWith": "3–6",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         },
         {
@@ -867,7 +867,7 @@
             "owner": "sw",
             "stats": {
                 "bggId": "467434",
-                "rating": "7.05",
+                "rating": "6.90",
                 "weight": "2.00",
                 "minPlayers": 3,
                 "maxPlayers": 6,
@@ -875,7 +875,7 @@
                 "maxPlaytime": 15,
                 "bestWith": "N/A",
                 "recommendedWith": "N/A",
-                "updatedAt": "2026-09-01"
+                "updatedAt": "2026-10-01"
             }
         }
     ]
